@@ -1,5 +1,5 @@
-import babel from '../lesson2/node_modules/rollup-plugin-babel';
-import serve from '../lesson2/node_modules/rollup-plugin-serve';
+import babel from 'rollup-plugin-babel';
+import serve from 'rollup-plugin-serve';
 
 export default {
     input: './src/index.js', // 入口文件
