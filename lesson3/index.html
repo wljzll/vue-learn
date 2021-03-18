@@ -1,24 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-  </head>
-  <body>
+</head>
+
+<body>
     <script src="dist/umd/vue.js"></script>
     <script>
-      // options Api 通过一个选项进行配置
-      let vm = new Vue({
-        el: "#app",
-        data() {
-          return {
-            a: { a: { a: 1 } },
-          };
-        },
-      });
-      vm._data.a = { b: 1 };
-      vm._data.a.b = 100;
+        // options Api 通过一个选项进行配置
+        let vm = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    arr: [{
+                        a: 1
+                    }],
+                };
+            },
+        });
+        vm._data.arr.push({
+            b: 2
+        })
+        vm._data.arr[1].b = 100
     </script>
-  </body>
+</body>
+
 </html>
