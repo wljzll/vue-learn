@@ -1,4 +1,3 @@
-import Vue from ".";
 import { initState } from "./state";
 
 // 在这里进行各种初始化操作
