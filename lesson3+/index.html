@@ -8,6 +8,9 @@
 </head>
 
 <body>
+    <div id="app">
+        {{arr}}
+    </div>
     <script src="dist/umd/vue.js"></script>
     <script>
         // options Api 通过一个选项进行配置
@@ -15,13 +18,15 @@
             el: "#app",
             data() {
                 return {
-                    arr: {b: {
-                        c:1
-                    }},
+                    arr: [1,2,3],
+                    school: {
+                        name: 'zf',
+                        age: 10
+                    }
                 };
             },
         });
-        console.log(vm._data)
+        console.log(vm.arr)
     </script>
 </body>
 
