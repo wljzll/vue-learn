@@ -14,10 +14,13 @@ export function compileToFunctions(template) {
   let ast = parseHTML(template);
 
   // 2、优化静态节点
-  console.log(ast);
+  // console.log(ast, 'ast');
 
   // 3、通过这棵树，重新生成代码
   let code = generate(ast);
-
+ 
+  let render = `with(this){return ${code}}`; // 用with包裹 要执行代码，通过改变this指向 指定with中模板字符串中的作用域
+  let renderFn = new Function(render); // 生成render函数
+  return renderFn;
   
 }

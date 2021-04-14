@@ -4,7 +4,7 @@ const startTagOpen = new RegExp(`^<${qnameCapture}`); // 标签开头的正则 �
 const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`); // 匹配标签结尾的 </div>
 const attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/; // 匹配属性的
 const startTagClose = /^\s*(\/?)>/; // 匹配标签结束的 >
-const defaultTagRE = /\{\{((?:.|\r?\n)+?)\}\}/g
+
 
 export function parseHTML(html) {
 
@@ -29,6 +29,7 @@ export function parseHTML(html) {
         }
         currentParent = element;
         stack.push(element);
+        // console.log(stack, 'stack')
     }
 
     function end(tagName) { // 在结尾标签处 创建父子关系
@@ -36,11 +37,12 @@ export function parseHTML(html) {
         currentParent = stack[stack.length - 1];
         if (currentParent) { // 在闭合时可以知道这个标签的父亲是谁
             element.parent = currentParent;
-            currentParent.children.push({ element })
+            currentParent.children.push(element)
         }
     }
 
     function chars(text) {
+        // 去空格
         text = text.replace(/\s/g, '');
         if (text) {
             currentParent.children.push({
@@ -75,7 +77,7 @@ export function parseHTML(html) {
         if (text) { // 处理文本
             advance(text.length);
             chars(text);
-            console.log(html)
+            // console.log(html);
         }
     }
 
@@ -96,7 +98,7 @@ export function parseHTML(html) {
             let attr;
             // 不是结尾标签(开始标签的闭合 >) 并且能匹配到属性
             while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
-                // console.log(attr)
+                // console.log(attr, '======')
                 match.attrs.push({
                     name: attr[1],
                     value: attr[3] || attr[4] || attr[5]
@@ -108,7 +110,7 @@ export function parseHTML(html) {
                 return match;
             }
         }
-    }
+    } // end parseStartTag
 
     return root;
 }
