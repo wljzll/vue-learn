@@ -1,4 +1,5 @@
 import { compileToFunctions } from "./compiler/index";
+import { mountComponent } from "./lifecycle";
 import { initState } from "./state";
 
 // 在这里进行各种初始化操作
@@ -31,5 +32,6 @@ export function initMixin(Vue) {
             const render = compileToFunctions(template);
             options.render = render;
         }
+        mountComponent(vm, el);
     };
 }
