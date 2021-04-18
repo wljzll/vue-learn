@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app" style="color:red;" class="test">
+      hello {{school}} <span>world</span>
+    </div>
+    <script src="dist/umd/vue.js"></script>
+    <script>
+        Vue.mixin({
+            created:function a () {
+                console.log('created', 'aaa');
+            }
+        })
+        // options Api 通过一个选项进行配置
+        let vm = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    arr: [1, 2, 3],
+                    school: {
+                        name: 'zf',
+                        age: 10
+                    }
+                };
+            },
+            created() {
+                console.log('created', '实例的')
+            }
+        });
+    </script>
+</body>
+
+</html>
