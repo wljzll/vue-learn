@@ -33,5 +33,6 @@ export function initMixin(Vue) {
             options.render = render;
             console.log(render, 'render函数');
         }
+        mountComponent(vm, el);
     };
 }
