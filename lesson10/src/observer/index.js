@@ -39,12 +39,12 @@ function defineReactive(data, key, value) {
     // 如果值是一个对象
     let childDep = observe(value)
     let dep = new Dep(); // 每个属性都有一个dep
-
     // 当页面取值时 说明这个值用来渲染了 这时将这个watcher和这个属性对应起来
     Object.defineProperty(data, key, {
         get() { // 依赖收集
             if (Dep.target) {  // 让这个属性记住这个watcher
                 dep.depend();
+                console.log(dep, 'dep')
                 if(childDep) { // 这里其实Object也会走，但是没用
                     childDep.dep.depend(); // 目的是让数组存起来这个渲染watcher，但是Object也会有一个
                 }

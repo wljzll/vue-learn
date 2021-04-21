@@ -1,4 +1,5 @@
 import { observe } from "./observer/index";
+import Watcher from "./observer/watcher";
 import { nextTick, proxy } from "./util";
 
 export function initState(vm) {
@@ -65,12 +66,19 @@ function createWatcher(vm, exprOrFn, handler, options) {
   }
 
   if (typeof handler === 'string') {
-    hanlder = vm[handler]; // 将实例方法作为handler
+    handler = vm[handler]; // 将实例方法作为handler
   }
-  return vm.$watch(exprOrFn, hanlder, options);
+  return vm.$watch(exprOrFn, handler, options);
 }
 export function stateMixin(Vue) {
   Vue.prototype.$nextTick = function (cb) {
     nextTick(cb);
+  }
+  Vue.prototype.$watch = function (exprOrFn, cb, options) {
+    // 数据应该依赖这个watcher，数据变化立刻执行这个watcher
+    let watcher = new Watcher(this, exprOrFn, cb, {...options, user: true});
+    if(options.immediate) { // 如果是immediate，立即执行
+      cb();
+    }
   }
 }

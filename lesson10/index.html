@@ -17,13 +17,17 @@
         el: "#app",
         data() {
           return {
-            a: 100,
+            a: {
+              a: {
+                a:1
+              }
+            },
           };
         },
         watch: {
-          a:{
-              handle() {
-                  console.log('xxx')
+          'a':{
+              handler(newValue, oldValue) {
+                  console.log(newValue, oldValue, 'xxx')
               }
           }
         },
@@ -31,6 +35,10 @@
 
       vm.a = 101;
       console.log(vm.a);
+      setTimeout(() => {
+        vm.a = 2000;
+      }, 2000);
+      console.log(vm);
     </script>
   </body>
 </html>
