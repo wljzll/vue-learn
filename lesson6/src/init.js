@@ -10,7 +10,6 @@ export function initMixin(Vue) {
         // vm.$options = options;
         vm.$options = mergeOptions(this.constructor.options, options); // 将用户new Vue时传入的options和混入的全局options做合并
         callHook(vm, 'beforeCreate');
-        // console.log(this.$options, '合并');
         // 初始化状态
         initState(vm);
         callHook(vm, 'created');
@@ -34,7 +33,6 @@ export function initMixin(Vue) {
             // 编译原理 将模板编译成render函数
             const render = compileToFunctions(template);
             options.render = render;
-            console.log(render, 'render函数');
         }
         mountComponent(vm, el);
     };
