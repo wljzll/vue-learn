@@ -49,6 +49,7 @@ function mergeHook(parentVal, childVal) {
     return parentVal;  // 不合并了 直接采用父亲的
   }
 }
+
 LIFECYCLE_HOOKS.forEach(hook => {
   strats[hook] = mergeHook;
 })
@@ -75,7 +76,7 @@ export function mergeOptions(parent, child) {
     if (strats[key]) {
        options[key] = strats[key](parent[key], child[key]);
     } else {
-      return  options[key] = child[key];
+      return options[key] = child[key];
     }
 
   }
