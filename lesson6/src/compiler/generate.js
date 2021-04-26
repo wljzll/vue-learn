@@ -4,7 +4,11 @@
 //       return _c('div', {id: 'app', style: {color: 'red'}}, _v('hello' + _s(name)), _c('span', null, _v('hello')))
 //   }
 const defaultTagRE = /\{\{((?:.|\r?\n)+?)\}\}/g
-// 生成属性
+/**
+ * 生成属性
+ * @param {*} attrs [name: "style",value: {color: "red", font-size: " 12px"}]
+ * @returns style:"fontSize:12px;color:red;"
+ */
 function genProps(attrs) {
   let str = "";
 
@@ -19,7 +23,6 @@ function genProps(attrs) {
         let [key, value] = item.split(":");
         obj[key] = value;
       });
-      console.log('obj', obj);
       attr.value = obj;
     }
     str += `${attr.name}:${JSON.stringify(attr.value)},`;
@@ -41,7 +44,6 @@ function gen(node) {
     let match, index;
 
     while ((match = defaultTagRE.exec(text))) {
-      // console.log('match', match, lastIndex);
       index = match.index; // 匹配到的{{}}的索引 ["{{name}}", "name", index: 6, input: "hellos{{name}}", groups: undefined]
       if (index > lastIndex) { // 说明index之前的是普通文本
         tokens.push(JSON.stringify(text.slice(lastIndex, index)));
@@ -67,11 +69,6 @@ function genChildren(el) {
 
 export function generate(el) {
   let children = genChildren(el);
-
-  console.log('children', children);
-
   let code = `_c('${el.tag}',${el.attrs.length ? `${genProps(el.attrs)}` : "undefined"}${children ? `, ${children}` : ""})`;
-
-  // console.log(code);
   return code;
 }

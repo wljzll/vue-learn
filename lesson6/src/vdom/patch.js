@@ -4,6 +4,7 @@
  * @param {*} vnode 
  */
 export function patch(oldVnode, vnode) {
+    console.log(oldVnode, vnode, 'patch');
     let el = createElm(vnode);
     let parentElm = oldVnode.parentNode; // 获取老的app的父亲 => body
     parentElm.insertBefore(el, oldVnode.nextSibling); // 当前的真实元素插入到app的前面
@@ -26,7 +27,6 @@ function createElm(vnode) {
 }
 
 function updateProperties(vnode) {
-    console.log(vnode, '***');
     let el = vnode.el;
     let newProps = vnode.data;
     for (const key in newProps) {
