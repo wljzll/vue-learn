@@ -27,14 +27,15 @@ export function parseHTML(html) {
         if (!root) {
             root = element;
         }
+        // 这个赋值的用途之一是给处理文本时使用，这时文本的父元素时element也就是currentParent
         currentParent = element;
         stack.push(element);
-        // console.log(stack, 'stack')
     }
 
     function end(tagName) { // 在结尾标签处 创建父子关系
+        // stack中的最后一个元素一定是倒数第二个元素的儿子
         let element = stack.pop(); // 取出栈中的最后一个
-        currentParent = stack[stack.length - 1];
+        currentParent = stack[stack.length - 1]; // 取出倒数第二个元素
         if (currentParent) { // 在闭合时可以知道这个标签的父亲是谁
             element.parent = currentParent;
             currentParent.children.push(element)
@@ -55,13 +56,13 @@ export function parseHTML(html) {
     while (html) { // 只要HTML不为空就一直解析下去
         let textEnd = html.indexOf('<')
         if (textEnd == 0) { // 可能是开始标签 也可能是结束标签
-            // 肯定是标签
             const startTagMatch = parseStartTag(); // 开始标签的匹配结果
             if (startTagMatch) { // 处理开始标签
                 start(startTagMatch.tagName, startTagMatch.attrs);
                 continue;
             }
-
+            
+            // 如果当前是结束标签
             const endTagMatch = html.match(endTag);
             if (endTagMatch) { // 处理结束标签
                 advance(endTagMatch[0].length);
@@ -70,14 +71,15 @@ export function parseHTML(html) {
             }
         }
         let text;
+        // 开始标签处理完后，如果textEnd > 0，那么到下一个 < 中间都是文本
         if (textEnd > 0) { // 处理文本
+            // 截取文本
             text = html.substring(0, textEnd);
 
         }
         if (text) { // 处理文本
             advance(text.length);
             chars(text);
-            // console.log(html);
         }
     }
 
@@ -93,12 +95,11 @@ export function parseHTML(html) {
                 attrs: []
             }
             advance(start[0].length); // 删除匹配到的标签
-            // 如果是闭合标签了 说明没有属性
+            // end 开始标签的闭合符
             let end;
             let attr;
-            // 不是结尾标签(开始标签的闭合 >) 并且能匹配到属性
+            // 不是开始标签的闭合符 并且能匹配到属性
             while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
-                // console.log(attr, '======')
                 match.attrs.push({
                     name: attr[1],
                     value: attr[3] || attr[4] || attr[5]

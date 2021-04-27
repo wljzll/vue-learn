@@ -26,7 +26,6 @@ function createElm(vnode) {
 }
 
 function updateProperties(vnode) {
-    console.log(vnode, '***');
     let el = vnode.el;
     let newProps = vnode.data;
     for (const key in newProps) {
