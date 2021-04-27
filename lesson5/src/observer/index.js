@@ -38,11 +38,9 @@ function defineReactive(data, key, value) {
     observe(value)
     Object.defineProperty(data, key, {
         get() {
-            console.log('用户获取值了', data, key, value)
             return value;
         },
         set(newValue) {
-            console.log('用户设置值了', data, key, value)
             if (newValue === value) return
                 // 如果用户将值设置为对象
             observe(newValue);

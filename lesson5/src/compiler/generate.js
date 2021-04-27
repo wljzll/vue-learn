@@ -19,7 +19,6 @@ function genProps(attrs) {
         let [key, value] = item.split(":");
         obj[key] = value;
       });
-      console.log('obj', obj);
       attr.value = obj;
     }
     str += `${attr.name}:${JSON.stringify(attr.value)},`;
@@ -53,7 +52,6 @@ function gen(node) {
     if (lastIndex < text.length) {
       tokens.push(JSON.stringify(text.slice(lastIndex)));
     }
-    // console.log('tokens', tokens)
     return `_v(${tokens.join("+")})`;
   }
 }

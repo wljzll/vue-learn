@@ -73,12 +73,49 @@ export function mergeOptions(parent, child) {
   function mergeField(key) { // 合并字段
     // 根据key不同 进行策略合并 data created mounted ......
     if (strats[key]) {
-       options[key] = strats[key](parent[key], child[key]);
+      options[key] = strats[key](parent[key], child[key]);
     } else {
-      return  options[key] = child[key];
+      return options[key] = child[key];
     }
 
   }
 
   return options;
+}
+
+let callbacks = [];
+let pending = false;
+function flushCallbacks() {
+  while (callbacks.length) {
+    let cb = callbacks.pop();
+    cb();
+  }
+  callbacks.forEach(cb => cb());
+  pending = false;
+}
+let timerFunc;
+if (Promise) {
+  timerFunc = () => {
+    Promise.resolve().then(flushCallbacks);
+  }
+} else if (MutationObserver) {
+  let observe = new MutationObserver(flushCallbacks);
+  let textNode = document.createTextNode(1);
+  observe.observe(textNode, { characterData: true });
+  timerFunc = () => {
+    textNode.textContent = 2;
+  }
+} else if (setImmediate) {
+  setImmediate(flushCallbacks);
+} else {
+  setTimeout(flushCallbacks);
+}
+
+export function nextTick(cb) {
+  callbacks.push(cb);
+  if (!pending) {
+    timerFunc();
+    pending = true;
+  }
+
 }

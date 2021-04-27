@@ -1,3 +1,4 @@
+import { nextTick } from "../util";
 import { popTarget, pushTarget } from "./dep";
 let id = 0;
 class Watcher {
@@ -47,19 +48,27 @@ class Watcher {
 let queue = []; // 将需要批量更新的watcher存到一个队列中 稍后执行
 let has = {};
 let pending = false;
+
+function flushSchedulerQueue() {
+    queue.forEach(watcher => {watcher.run();watcher.cb();});
+    queue = [];
+    has = {};
+    pending = false;
+}
 function queueWatcher(watcher) {
     const id = watcher.id;
     if (has.id == null) {
         queue.push(watcher)
         has.id = true;
     }
-    if(!pending) {
-        setTimeout(() => {
-            queue.forEach(watcher => watcher.run());
-            queue = [];
-            has = {};
-            pending = false;
-        }, 0);
+    if (!pending) {
+        // setTimeout(() => {
+        //     queue.forEach(watcher => watcher.run());
+        //     queue = [];
+        //     has = {};
+        //     pending = false;
+        // }, 0);
+        nextTick(flushSchedulerQueue);
         pending = true;
     }
     console.log(watcher);
