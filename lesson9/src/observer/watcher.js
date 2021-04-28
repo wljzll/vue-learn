@@ -71,7 +71,6 @@ function queueWatcher(watcher) {
         nextTick(flushSchedulerQueue);
         pending = true;
     }
-    console.log(watcher);
 }
 /**
  * 在数据劫持的时候 定义 defineProperty的时候，已经给每个属性都添加了dep
