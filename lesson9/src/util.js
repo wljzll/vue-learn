@@ -90,7 +90,6 @@ function flushCallbacks() {
     let cb = callbacks.pop();
     cb();
   }
-  callbacks.forEach(cb => cb());
   pending = false;
 }
 let timerFunc;
