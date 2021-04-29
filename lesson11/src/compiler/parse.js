@@ -51,7 +51,6 @@ export function parseHTML(html) {
             })
         }
     }
-
     while (html) { // 只要HTML不为空就一直解析下去
         let textEnd = html.indexOf('<')
         if (textEnd == 0) { // 可能是开始标签 也可能是结束标签
@@ -75,9 +74,8 @@ export function parseHTML(html) {
 
         }
         if (text) { // 处理文本
-            advance(text.length);
             chars(text);
-            // console.log(html);
+            advance(text.length);
         }
     }
 
@@ -94,16 +92,16 @@ export function parseHTML(html) {
             }
             advance(start[0].length); // 删除匹配到的标签
             // 如果是闭合标签了 说明没有属性
-            let end;
-            let attr;
+            let end, attr;
             // 不是结尾标签(开始标签的闭合 >) 并且能匹配到属性
             while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
                 // console.log(attr, '======')
+                advance(attr[0].length); // 去掉当前属性
                 match.attrs.push({
                     name: attr[1],
                     value: attr[3] || attr[4] || attr[5]
                 })
-                advance(attr[0].length); // 去掉当前属性
+              
             }
             if (end) {
                 advance(end[0].length);
