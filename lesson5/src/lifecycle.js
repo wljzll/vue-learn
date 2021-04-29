@@ -8,6 +8,5 @@ export function lifecycleMixin(Vue) {
 }
 
 export function mountComponent(vm, el) {
-    console.log(vm._render(), '_render')
     vm._update(vm._render());
 }

@@ -31,12 +31,12 @@ const strats = {};
 strats.data = function (parentVal, childVal) {
   return childVal;
 }
-strats.computed = function () {
+// strats.computed = function () {
 
-}
-strats.watch = function () {
+// }
+// strats.watch = function () {
 
-}
+// }
 
 function mergeHook(parentVal, childVal) {
   if (childVal) { // 儿子有值
@@ -90,6 +90,7 @@ function flushCallbacks() {
     let cb = callbacks.pop();
     cb();
   }
+  callbacks.forEach(cb => cb());
   pending = false;
 }
 let timerFunc;

@@ -41,7 +41,7 @@ function initData(vm) {
 function initComputed() { }
 
 function initWatch(vm) {
-  let watch = vm.$options.watch || {};
+  let watch = vm.$options.watch;
   for (let key in watch) {
     const handler = watch[key]; // 每个watch watch可能是函数/数组/对象/字符串
     if (Array.isArray(handler)) {

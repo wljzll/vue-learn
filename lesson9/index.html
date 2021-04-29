@@ -41,6 +41,10 @@
             vm.arr.push(199);
             vm.arr.push(199);
             vm.arr.push(199);
+            console.log(vm.$el.innerHTML)
+            vm.$nextTick(() => {
+                console.log(vm.$el.innerHTML, '=====')
+            })
         }, 2000);
         console.log(vm);
     </script>

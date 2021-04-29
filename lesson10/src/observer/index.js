@@ -44,7 +44,6 @@ function defineReactive(data, key, value) {
         get() { // 依赖收集
             if (Dep.target) {  // 让这个属性记住这个watcher
                 dep.depend();
-                console.log(dep, 'dep')
                 if(childDep) { // 这里其实Object也会走，但是没用
                     childDep.dep.depend(); // 目的是让数组存起来这个渲染watcher，但是Object也会有一个
                 }
