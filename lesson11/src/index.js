@@ -1,11 +1,11 @@
 import { initGlobalApi } from "./global-api/index";
-import { initMixin } from "./init"
+import { initMixin } from "./init";
 import { lifecycleMixin } from "./lifecycle";
 import { stateMixin } from "./state";
 import { renderMixin } from "./vdom/index";
 
 function Vue(options) {
-    this._init(options)
+  this._init(options);
 }
 
 // 原型方法初始化
@@ -20,8 +20,8 @@ initGlobalApi(Vue);
 import { compileToFunctions } from "./compiler/index";
 import { createElm, patch } from "./vdom/patch";
 let vm1 = new Vue({
-    data: { name: 'zf' }
-})
+  data: { name: "zf" },
+});
 let render1 = compileToFunctions(`<div id="a" class="common">
   <li style="background:pink;" key="D">D</li>
   <li style="background:red;" key="A">A</li>
@@ -31,21 +31,21 @@ let render1 = compileToFunctions(`<div id="a" class="common">
 let vnode1 = render1.call(vm1);
 document.body.appendChild(createElm(vnode1));
 
-
-// 
+//
 let vm2 = new Vue({
-    data: { name: 'px' }
-})
+  data: { name: "px" },
+});
 let render2 = compileToFunctions(`<div>
+<li style="background:blue;"  key="F">F</li>
 <li style="background:pink;"  key="D">DDD</li>
-<li style="background:red;"  key="A">A</li>
-<li style="background:yellow;"  key="B">B</li>
 <li style="background:blue;"  key="C">C</li>
-
+<li style="background:yellow;"  key="B">B</li>
+<li style="background:red;"  key="A">A</li>
+<li style="background:blue;"  key="E">E</li>
 </div>`);
 let vnode2 = render2.call(vm2);
 setTimeout(() => {
-    patch(vnode1, vnode2);
+  patch(vnode1, vnode2);
 }, 5000);
 
-export default Vue
+export default Vue;
