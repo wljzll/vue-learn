@@ -17,5 +17,4 @@ stateMixin(Vue);
 // 静态方法 Vue.component/Vue.directive/Vue.extend/Vue.mixin
 initGlobalApi(Vue);
 
-
 export default Vue;
