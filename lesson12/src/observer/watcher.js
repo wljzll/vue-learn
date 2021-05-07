@@ -15,10 +15,10 @@ class Watcher {
         this.cb = cb;
         this.options = options;
         this.user = options.user; // 标识这是一个用户watcher
-        
+
         // computed用到的变量
         this.lazy = options.lazy; // 如果watcher上有lazy属性，说明是计算属性
-        this.dirty = this.lazy;  // dirty表示取值时是否执行是否执行用户提供的方法
+        this.dirty = this.lazy; // dirty表示取值时是否执行是否执行用户提供的方法
 
         this.isWatcher = typeof options === 'boolean'; // 标识是渲染watcher
         this.id = id++; // watcher的唯一标识
@@ -27,7 +27,7 @@ class Watcher {
         if (typeof exprOrFn === 'function') {
             this.getter = exprOrFn
         } else {
-            this.getter = function () { // 可能传递过来的是一个字符串
+            this.getter = function() { // 可能传递过来的是一个字符串
                 // 只有去当前实例上取值时 才会触发依赖收集
                 let path = exprOrFn.split('.'); // ['a', 'a', 'a']
                 let obj = vm;
@@ -53,8 +53,8 @@ class Watcher {
     }
     run() {
         let newValue = this.get();
-        let oldValue = this.value; 
-        if(this.user) {
+        let oldValue = this.value;
+        if (this.user) {
             this.cb.call(this.vm, newValue, oldValue);
         }
     }
@@ -65,18 +65,22 @@ class Watcher {
         return result;
     }
     update() {
-        if(this.lazy) {
-            this.dirty = true;
-        } else {
-            queueWatcher(this);
+            if (this.lazy) {
+                this.dirty = true;
+            } else {
+                queueWatcher(this);
+            }
+
+            // this.get();
         }
-        
-        // this.get();
-    }
-    // 计算属性求值
+        // 计算属性求值
     evaluate() {
-        this.value = this.get();
-        this.dirty = false; // 取过一次值后，就标识成已经取过值了
+            this.value = this.get();
+            this.dirty = false; // 取过一次值后，就标识成已经取过值了
+        }
+        // computed的watcher调用，用来收集渲染watcher
+    depend() {
+
     }
 }
 let queue = []; // 将需要批量更新的watcher存到一个队列中 稍后执行
@@ -84,17 +88,18 @@ let has = {};
 let pending = false;
 
 function flushSchedulerQueue() {
-    queue.forEach(watcher => { 
-        watcher.run(); 
-        if(watcher.isWatcher) {
-            watcher.cb(); 
+    queue.forEach(watcher => {
+        watcher.run();
+        if (watcher.isWatcher) {
+            watcher.cb();
         }
-       
+
     });
     queue = [];
     has = {};
     pending = false;
 }
+
 function queueWatcher(watcher) {
     const id = watcher.id;
     if (has.id == null) {

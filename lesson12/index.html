@@ -1,34 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-  </head>
-  <body>
+</head>
+
+<body>
     <div id="app">
-      <span>珠峰</span>
+        {{fullName}}
     </div>
     <script src="dist/umd/vue.js"></script>
     <script>
-      let vm = new Vue({
-        el: '#app',
-        data: function() {
-          return {
-             firstName: 'zf',
-             lastName: 'px'
-          }
-        },
-        computed:{
-          fullName() {
-            console.log('调用了');
-            return this.firstName + this.lastName;
-          }
-        }
-      })
+        let vm = new Vue({
+            el: '#app',
+            data: function() {
+                return {
+                    firstName: 'zf',
+                    lastName: 'px'
+                }
+            },
+            computed: {
+                fullName() {
+                    console.log('调用了');
+                    return this.firstName + this.lastName;
+                }
+            }
+        })
 
-      vm.fullName;
-
+        vm.fullName;
+        vm.firstName = 'xx';
+        console.log(vm.fullName);
     </script>
-  </body>
+</body>
+
 </html>

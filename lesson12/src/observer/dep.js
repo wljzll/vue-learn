@@ -2,7 +2,7 @@ let id = 0;
 class Dep {
     constructor() {
         this.subs = [];
-        this.id = id ++;
+        this.id = id++;
     }
     depend() {
         // 实现dep和watcher的双向记忆
@@ -17,11 +17,14 @@ class Dep {
     }
 }
 Dep.target = null;
+let stack = [];
 export function pushTarget(watcher) {
     Dep.target = watcher; // 保留watcher
+    stack.push(watcher); // 收集watcher
 }
 export function popTarget() {
-    Dep.target = null;  // 将变量删除
+    stack.pop();
+    Dep.target = stack[stack.length - 1]; // 将变量删除
 }
 
 export default Dep;
