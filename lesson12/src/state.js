@@ -40,27 +40,42 @@ function initData(vm) {
 
 function initComputed(vm) {
   let computed = vm.$options.computed;
-  const watcher = vm._computedWatchers = {}; // 稍后用来存放计算属性的watcher
+  const watcher = (vm._computedWatchers = {}); // 稍后用来存放计算属性的watcher
   for (let key in computed) {
     const userDef = computed[key]; // 取出每一个computed
     const getter = typeof userDef == "function" ? userDef : userDef.get; // 这个getter是给watcher使用的
+    watcher[key] = new Watcher(vm, getter, () => {}, { lazy: true });
     defineComputed(vm, key, userDef);
   }
 }
 
-const sharedPropertyDefinition = {};
 function defineComputed(target, key, userDef) {
+  const sharedPropertyDefinition = {
+    enumerable: true,
+    configurable: true,
+    get: () => {},
+    set: () => {},
+  };
   if (typeof userDef == "function") {
-    sharedPropertyDefinition.get = userDef;
+    sharedPropertyDefinition.get = createComputedGetter(key);
   } else {
-    sharedPropertyDefinition.get = userDef.get;
+    sharedPropertyDefinition.get = createComputedGetter(key);
     sharedPropertyDefinition.set = userDef.set;
   }
-  console.log(target, key, userDef);
   Object.defineProperty(target, key, sharedPropertyDefinition);
-  console.log(target,sharedPropertyDefinition);
 }
 
+function createComputedGetter(key) {
+  return function () {
+    const watcher = this._computedWatchers[key];
+    if (watcher) {
+      if (watcher.dirty) {
+        watcher.evaluate(); // 对当前watcher求值
+      }
+      return watcher.value;
+    }
+  };
+}
 function initWatch(vm) {
   let watch = vm.$options.watch;
   for (let key in watch) {

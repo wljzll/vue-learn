@@ -15,6 +15,11 @@ class Watcher {
         this.cb = cb;
         this.options = options;
         this.user = options.user; // 标识这是一个用户watcher
+        
+        // computed用到的变量
+        this.lazy = options.lazy; // 如果watcher上有lazy属性，说明是计算属性
+        this.dirty = this.lazy;  // dirty表示取值时是否执行是否执行用户提供的方法
+
         this.isWatcher = typeof options === 'boolean'; // 标识是渲染watcher
         this.id = id++; // watcher的唯一标识
         this.deps = []; // watcher记录有多少dep依赖它
@@ -33,8 +38,8 @@ class Watcher {
 
             }
         }
-        // 获取的是老值
-        this.value = this.get(); // 默认调用getter方法，也就是exprOrFn
+        // 获取的是老值 当是计算属性的watcher时，默认不执行，当是用户的$watch或渲染watcher时，默认执行
+        this.value = this.lazy ? void 0 : this.get(); // 默认调用getter方法，也就是exprOrFn
     }
     addDep(dep) {
         let id = dep.id;
@@ -55,13 +60,23 @@ class Watcher {
     }
     get() {
         pushTarget(this); // 添加这个watcher实例
-        let result = this.getter();
+        let result = this.getter.call(this.vm);
         popTarget();
         return result;
     }
     update() {
-        queueWatcher(this);
+        if(this.lazy) {
+            this.dirty = true;
+        } else {
+            queueWatcher(this);
+        }
+        
         // this.get();
+    }
+    // 计算属性求值
+    evaluate() {
+        this.value = this.get();
+        this.dirty = false; // 取过一次值后，就标识成已经取过值了
     }
 }
 let queue = []; // 将需要批量更新的watcher存到一个队列中 稍后执行
