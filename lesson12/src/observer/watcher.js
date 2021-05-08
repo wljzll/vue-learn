@@ -27,7 +27,7 @@ class Watcher {
         if (typeof exprOrFn === 'function') {
             this.getter = exprOrFn
         } else {
-            this.getter = function() { // 可能传递过来的是一个字符串
+            this.getter = function () { // 可能传递过来的是一个字符串
                 // 只有去当前实例上取值时 才会触发依赖收集
                 let path = exprOrFn.split('.'); // ['a', 'a', 'a']
                 let obj = vm;
@@ -65,22 +65,25 @@ class Watcher {
         return result;
     }
     update() {
-            if (this.lazy) {
-                this.dirty = true;
-            } else {
-                queueWatcher(this);
-            }
-
-            // this.get();
+        if (this.lazy) {
+            this.dirty = true;
+        } else {
+            queueWatcher(this);
         }
-        // 计算属性求值
+
+        // this.get();
+    }
+    // 计算属性求值
     evaluate() {
-            this.value = this.get();
-            this.dirty = false; // 取过一次值后，就标识成已经取过值了
-        }
-        // computed的watcher调用，用来收集渲染watcher
+        this.value = this.get();
+        this.dirty = false; // 取过一次值后，就标识成已经取过值了
+    }
+    // computed的watcher调用，用来收集渲染watcher
     depend() {
-
+        let i = this.deps.length;
+        while (i--) {
+            this.deps[i].depend(); // 让dep去储存渲染watcher
+        }
     }
 }
 let queue = []; // 将需要批量更新的watcher存到一个队列中 稍后执行
