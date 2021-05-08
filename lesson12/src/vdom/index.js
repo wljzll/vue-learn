@@ -1,18 +1,18 @@
 export function renderMixin(Vue) {
 
-    Vue.prototype._c = function () { // 创建虚拟元素
+    Vue.prototype._c = function() { // 创建虚拟元素
         return createElement(...arguments);
     }
 
-    Vue.prototype._s = function (val) { // 解析插值表达式 stringify
+    Vue.prototype._s = function(val) { // 解析插值表达式 stringify
         return val = null ? '' : (typeof val === 'object') ? JSON.stringify(val) : val;
     }
 
-    Vue.prototype._v = function (text) { // 创建虚拟文本元素
+    Vue.prototype._v = function(text) { // 创建虚拟文本元素
         return createTextVnode(text);
     }
 
-    Vue.prototype._render = function () {
+    Vue.prototype._render = function() {
         const vm = this;
         const render = vm.$options.render;
         let vnode = render.call(vm);
@@ -25,7 +25,7 @@ function createElement(tag, data = {}, ...children) {
 }
 
 function createTextVnode(text) {
-   return vnode(undefined, undefined, undefined, undefined, text);
+    return vnode(undefined, undefined, undefined, undefined, text);
 }
 
 /**
