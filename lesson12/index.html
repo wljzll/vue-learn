@@ -9,10 +9,17 @@
 
 <body>
     <div id="app">
-        {{fullName}}
+        {{firstName}}
     </div>
     <script src="dist/umd/vue.js"></script>
     <script>
+        // 全局组件
+        Vue.component('my-button', {
+            template: '<button>点我啊</button>'
+        })
+        Vue.component('aa', {
+            template: '<div>aa</div>'
+        })
         let vm = new Vue({
             el: '#app',
             data: function() {
@@ -21,17 +28,16 @@
                     lastName: 'px'
                 }
             },
-            computed: {
-                fullName() {
-                    console.log('调用了');
-                    return this.firstName + this.lastName;
+            components: {
+                aa: {
+                    template: '<div>hello</div>'
+                },
+                bb: {
+                    template: '<div>world</div>'
                 }
             }
         })
-
-        setTimeout(() => {
-            vm.firstName = 'xx';
-        }, 2000);
+        console.log(vm);
     </script>
 </body>
 

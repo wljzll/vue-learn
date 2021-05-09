@@ -1,7 +1,9 @@
+import { isReservedTag } from "../util";
+
 export function renderMixin(Vue) {
 
     Vue.prototype._c = function() { // 创建虚拟元素
-        return createElement(...arguments);
+        return createElement(this, ...arguments);
     }
 
     Vue.prototype._s = function(val) { // 解析插值表达式 stringify
@@ -20,8 +22,32 @@ export function renderMixin(Vue) {
     }
 }
 
-function createElement(tag, data = {}, ...children) {
-    return vnode(tag, data, data.key, children);
+function createElement(vm, tag, data = {}, ...children) {
+    if (isReservedTag(tag)) { // 是原生标签，不是组件，走之前逻辑
+        return vnode(tag, data, data.key, children);
+    } else { // 是组件
+        let Ctor = vm.$options.components[tag];
+        // 创建组件的虚拟节点
+        return createComponent(vm, tag, data, data.key, children, Ctor);
+    }
+
+}
+
+function createComponent(vm, tag, data, key, children, Ctor) {
+    const baseCtor = vm.$options._base;
+    if (typeof Ctor == 'object') {
+        Ctor = baseCtor.extend(Ctor);
+    }
+    data.hook = {
+        init() {
+
+        }
+    }
+
+    return vnode(`vue-component-${Ctor.cid}-${tag}`, tag, data, key, undefined, undefined, {
+        Ctor,
+        children
+    })
 }
 
 function createTextVnode(text) {
@@ -37,12 +63,13 @@ function createTextVnode(text) {
  * @param {*} text 
  * @returns 
  */
-function vnode(tag, data, key, children, text) {
+function vnode(tag, data, key, children, text, componentOptions) {
     return {
         tag,
         data,
         key,
         children,
-        text
+        text,
+        componentOptions // 组件的虚拟节点多了一个componentOptions，用来保存当前组件的构造函数和它的插槽
     }
 }
