@@ -2,19 +2,19 @@ import { isReservedTag } from "../util";
 
 export function renderMixin(Vue) {
 
-    Vue.prototype._c = function() { // 创建虚拟元素
+    Vue.prototype._c = function () { // 创建虚拟元素
         return createElement(this, ...arguments);
     }
 
-    Vue.prototype._s = function(val) { // 解析插值表达式 stringify
+    Vue.prototype._s = function (val) { // 解析插值表达式 stringify
         return val = null ? '' : (typeof val === 'object') ? JSON.stringify(val) : val;
     }
 
-    Vue.prototype._v = function(text) { // 创建虚拟文本元素
+    Vue.prototype._v = function (text) { // 创建虚拟文本元素
         return createTextVnode(text);
     }
 
-    Vue.prototype._render = function() {
+    Vue.prototype._render = function () {
         const vm = this;
         const render = vm.$options.render;
         let vnode = render.call(vm);
@@ -39,8 +39,9 @@ function createComponent(vm, tag, data, key, children, Ctor) {
         Ctor = baseCtor.extend(Ctor);
     }
     data.hook = {
-        init() {
-
+        init(vnode) {
+            let child = vnode.componentInstance = new Ctor();
+            child.$mount(); // 挂载逻辑 组件的$mount方法中是不传递参数的
         }
     }
 
