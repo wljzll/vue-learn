@@ -4,6 +4,9 @@
  * @param {*} vnode
  */
 export function patch(oldVnode, vnode) {
+  if(!oldVnode) {
+    return createElm(vnode);
+  }
   if (oldVnode.nodeType === 1) {
     // 真实DOM节点
     let el = createElm(vnode);
@@ -74,7 +77,7 @@ function updateChildren(oldChildren, newChildren, parent) {
     return map;
   }
   let map = makeIndexByKey(oldChildren);
-  
+
   while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
     if (!oldStartVnode) {
       // 遇到被暴力比对置为null的元素，跳过
@@ -149,9 +152,23 @@ function updateChildren(oldChildren, newChildren, parent) {
   }
 }
 
+function createComponent(vnode) {
+  // 调用组件hook中的init方法
+  let i = vnode.data;
+  if ((i = i.hook) && (i = i.init)) { // i就是init方法
+    i(vnode);
+  }
+  if(vnode.componentInstance) {
+    return true;
+  }
+}
+
 export function createElm(vnode) {
   let { tag, children, key, data, text } = vnode;
   if (typeof tag === "string") {
+    if (createComponent(vnode)) {
+      return vnode.componentInstance.$el;
+    }
     // 如果是一个标签
     vnode.el = document.createElement(tag);
     // 处理元素属性
