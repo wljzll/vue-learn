@@ -1,44 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-  </head>
+</head>
 
-  <body>
-    <div id="app"></div>
+<body>
+    <div id="app" style="color: red;font-size: 12px;">
+
+    </div>
     <script src="dist/umd/vue.js"></script>
     <!-- <script src="./node_modules/vue/dist/vue.min.js"></script> -->
     <script>
-      // 全局组件
-      Vue.component("my-button", {
-        template: "<button>点我啊</button>",
-      });
-      Vue.component("aa", {
-        template: "<div>aa</div>",
-      });
-      let vm = new Vue({
-        el: "#app",
-        data: function () {
-          return {
-            a: 1,
-            b: [1, 2, 3],
-            c:{
-                cc:1
+        // 全局组件
+        Vue.component("my-button", {
+            template: "<button>点我啊</button>",
+        });
+        Vue.component("aa", {
+            template: "<div>aa</div>",
+        });
+        let vm = new Vue({
+            el: "#app",
+            data: function() {
+                return {
+                    a: 1,
+                    b: [1, 2, 3],
+                    c: {
+                        cc: 1
+                    }
+                };
+            },
+            components: {
+                aa: {
+                    template: "<div>hello</div>",
+                },
+                bb: {
+                    template: "<div>world</div>",
+                },
+            },
+            mounted() {
+
             }
-          };
-        },
-        components: {
-          aa: {
-            template: "<div>hello</div>",
-          },
-          bb: {
-            template: "<div>world</div>",
-          },
-        },
-      });
-      console.log(vm);
+        });
+        console.log(vm);
     </script>
-  </body>
+</body>
+
 </html>
