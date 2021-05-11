@@ -37,7 +37,7 @@ class Observer {
 
 function defineReactive(data, key, value) {
     // 如果值是一个对象
-    let childDep = observe(value)
+    let childDep = observe(value);
     let dep = new Dep(); // 每个属性都有一个dep
     // 当页面取值时 说明这个值用来渲染了 这时将这个watcher和这个属性对应起来
     Object.defineProperty(data, key, {
@@ -60,7 +60,10 @@ function defineReactive(data, key, value) {
     })
 }
 
-
+// {
+//     a:1,
+//     b: [1,2,3]
+// }
 export function observe(data) {
     // 如果data不是Object或者为null时，无法处理
     if (typeof data !== 'object' || data == null) {
