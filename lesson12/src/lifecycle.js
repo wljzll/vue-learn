@@ -7,6 +7,7 @@ export function lifecycleMixin(Vue) {
         // 初次渲染不存在_vnode
         const prevNode = vm._vnode;
         // 这里需要区分一下，到底是首次渲染还是更新
+        // console.log(vm.$el, '123');
         if (!prevNode) {
             vm.$el = patch(vm.$el, vnode);
         } else {
