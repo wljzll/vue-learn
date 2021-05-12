@@ -54,13 +54,13 @@ export function parseHTML(html) {
     while (html) { // 只要HTML不为空就一直解析下去
         let textEnd = html.indexOf('<')
         if (textEnd == 0) { // 可能是开始标签 也可能是结束标签
-            // 肯定是标签
+            // 获取开始标签及属性
             const startTagMatch = parseStartTag(); // 开始标签的匹配结果
             if (startTagMatch) { // 处理开始标签
                 start(startTagMatch.tagName, startTagMatch.attrs);
                 continue;
             }
-
+            // 获取结束标签
             const endTagMatch = html.match(endTag);
             if (endTagMatch) { // 处理结束标签
                 advance(endTagMatch[0].length);
@@ -91,9 +91,9 @@ export function parseHTML(html) {
                 attrs: []
             }
             advance(start[0].length); // 删除匹配到的标签
-            // 如果是闭合标签了 说明没有属性
+            // 如果是闭合符 说明没有属性
             let end, attr;
-            // 不是结尾标签(开始标签的闭合 >) 并且能匹配到属性
+            // 不是开始标签的闭合符 并且能匹配到属性
             while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
                 // console.log(attr, '======')
                 advance(attr[0].length); // 去掉当前属性

@@ -67,11 +67,6 @@ function genChildren(el) {
 
 export function generate(el) {
   let children = genChildren(el);
-
-  // console.log('children', children);
-
   let code = `_c('${el.tag}',${el.attrs.length ? `${genProps(el.attrs)}` : "undefined"}${children ? `, ${children}` : ""})`;
-
-  // console.log(code);
   return code;
 }
