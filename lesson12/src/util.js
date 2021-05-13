@@ -105,9 +105,9 @@ function flushCallbacks() {
     let cb = callbacks.pop();
     cb();
   }
-  callbacks.forEach((cb) => cb());
   pending = false;
 }
+
 let timerFunc;
 if (Promise) {
   timerFunc = () => {
@@ -121,9 +121,13 @@ if (Promise) {
     textNode.textContent = 2;
   };
 } else if (setImmediate) {
-  setImmediate(flushCallbacks);
+  timerFunc = () => {
+    setImmediate(flushCallbacks);
+  }
 } else {
-  setTimeout(flushCallbacks);
+  timerFunc = () => {
+    setTimeout(flushCallbacks);
+  }
 }
 
 export function nextTick(cb) {
