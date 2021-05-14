@@ -4,7 +4,6 @@
  * @param {*} vnode
  */
 export function patch(oldVnode, vnode) {
-    console.log(oldVnode, vnode);
     if (!oldVnode) { // 说明是组件
         return createElm(vnode);
     }

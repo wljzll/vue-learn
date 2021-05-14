@@ -23,6 +23,7 @@ export function renderMixin(Vue) {
 }
 
 function createElement(vm, tag, data = {}, ...children) {
+    console.log(arguments);
     if (isReservedTag(tag)) { // 是原生标签，不是组件，走之前逻辑
         return vnode(tag, data, data.key, children);
     } else { // 是组件
@@ -40,12 +41,12 @@ function createComponent(vm, tag, data, key, children, Ctor) {
     }
     data.hook = {
         init(vnode) {
-            let child = vnode.componentInstance = new Ctor();
+            let child = vnode.componentInstance = new Ctor({});
             child.$mount(); // 挂载逻辑 组件的$mount方法中是不传递参数的
         }
     }
 
-    return vnode(`vue-component-${Ctor.cid}-${tag}`, tag, data, key, undefined, undefined, {
+    return vnode(`vue-component-${Ctor.cid}-${tag}`, data, key, undefined, undefined, {
         Ctor,
         children
     })
