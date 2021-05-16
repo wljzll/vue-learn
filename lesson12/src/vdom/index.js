@@ -23,7 +23,6 @@ export function renderMixin(Vue) {
 }
 
 function createElement(vm, tag, data = {}, ...children) {
-    console.log(arguments);
     if (isReservedTag(tag)) { // 是原生标签，不是组件，走之前逻辑
         return vnode(tag, data, data.key, children);
     } else { // 是组件
