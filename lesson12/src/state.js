@@ -61,7 +61,7 @@ function defineComputed(target, key, userDef) {
     if (typeof userDef == "function") {
         sharedPropertyDefinition.get = createComputedGetter(key);
     } else {
-        sharedPropertyDefinition.get = createComputedGetter(key);
+        sharedPropertyDefinition.get = createComputedGetter(userDef.get);
         sharedPropertyDefinition.set = userDef.set;
     }
     Object.defineProperty(target, key, sharedPropertyDefinition);
