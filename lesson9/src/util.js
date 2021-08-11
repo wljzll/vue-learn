@@ -83,15 +83,20 @@ export function mergeOptions(parent, child) {
   return options;
 }
 
+
+// 批量的回调函数
 let callbacks = [];
 let pending = false;
+// 将callbacks中的函数依次执行
 function flushCallbacks() {
   while (callbacks.length) {
     let cb = callbacks.pop();
     cb();
   }
-  pending = false;
+  pending = false; // 当此次批量更新完成后 会继续下一次的nextTick
 }
+
+// 能力检测
 let timerFunc;
 if (Promise) {
   timerFunc = () => {
@@ -110,11 +115,15 @@ if (Promise) {
   setTimeout(flushCallbacks);
 }
 
+/**
+ * @description 批量执行 回调函数参数
+ * @param {*} cb 函数参数 收集的更新watcher集合或者用户传入的函数参数
+ */
 export function nextTick(cb) {
-  callbacks.push(cb);
-  if (!pending) {
+  callbacks.push(cb); // 收集回调函数
+  if (!pending) { // 本次nextTick执行完成 才去开启下一轮nextTick
     timerFunc();
-    pending = true;
+    pending = true; // 第一次收集后将pending置为true，不再调用timerFunc 只可能会继续收集 回调
   }
 
 }

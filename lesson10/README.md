@@ -11,7 +11,7 @@
    > 2、key/value(value是一个object)
     watch: {
         a:{
-            handle() {
+            handler() {
                 console.log('xxx')
             }
         }

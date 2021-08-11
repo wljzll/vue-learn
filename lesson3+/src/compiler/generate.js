@@ -4,10 +4,9 @@
 //       return _c('div', {id: 'app', style: {color: 'red'}}, _v('hello' + _s(name)), _c('span', null, _v('hello')))
 //   }
 const defaultTagRE = /\{\{((?:.|\r?\n)+?)\}\}/g
-    // 生成属性
+// 生成属性
 function genProps(attrs) {
     let str = "";
-
     for (let i = 0; i < attrs.length; i++) {
         // id "app"  style "fontSize: 12px; color: red;"
         let attr = attrs[i];
@@ -28,13 +27,15 @@ function genProps(attrs) {
 }
 
 function gen(node) {
-    if (node.type == 1) {
+    if (node.type == 1) { // 如果是元素节点 递归将当前元素和其children处理成字符串函数
         return generate(node);
-    } else {
+    } else { // 如果是文本节点
         let text = node.text;
-        if (!defaultTagRE.test(text)) { // 如果是普通文本
+        if (!defaultTagRE.test(text)) { // 如果只是普通文本
             return `_v(${JSON.stringify(text)})`;
         }
+
+        // 模板字符串文本处理
         // 每次使用正则，重新初始化lastIndex
         let lastIndex = (defaultTagRE.lastIndex = 0);
         let tokens = [];
@@ -53,25 +54,36 @@ function gen(node) {
         if (lastIndex < text.length) {
             tokens.push(JSON.stringify(text.slice(lastIndex)));
         }
-        // console.log('tokens', tokens)
-        return `_v(${tokens.join("+")})`;
+        // console.log('tokens',tokens)
+        return `_v(${tokens.join("+")})`; // _v("hello"+_s(school))
     }
 }
 
+/**
+ * 
+ * @param {Object} el 
+ * @returns 处理后的子元素
+ */
 function genChildren(el) {
+    // 获取当前元素的子元素
     const children = el.children;
     if (children) { // 将所有转换后的儿子用逗号隔开
         return children.map((child) => gen(child)).join(",");
     }
 }
 
+/**
+ * @description 将抽象语法树解析成_c()函数包装的字符串
+ * @param {Object} el 
+ * @returns 字符串函数
+ */
 export function generate(el) {
-    let children = genChildren(el);
 
+    let children = genChildren(el);
     console.log('children', children);
 
     let code = `_c('${el.tag}',${el.attrs.length ? `${genProps(el.attrs)}` : "undefined"}${children ? `, ${children}` : ""})`;
 
-  // console.log(code);
-  return code;
+    // console.log(code);
+    return code;
 }

@@ -45,22 +45,34 @@ class Watcher {
         // this.get();
     }
 }
+
+
 let queue = []; // 将需要批量更新的watcher存到一个队列中 稍后执行
 let has = {};
 let pending = false;
 
+/**
+ * 批量刷新watcher队列
+ */
 function flushSchedulerQueue() {
     queue.forEach(watcher => {watcher.run();watcher.cb();});
     queue = [];
     has = {};
     pending = false;
 }
+
+/**
+ * 收集要更新的watcher 批量更新
+ * @param {*} watcher watcher实例
+ */
 function queueWatcher(watcher) {
     const id = watcher.id;
+    // 收集watcher
     if (has.id == null) {
         queue.push(watcher)
         has.id = true;
     }
+    // 在这段时间内收集的watcher未执行完 不再重新执行 nextTick
     if (!pending) {
         // setTimeout(() => {
         //     queue.forEach(watcher => watcher.run());

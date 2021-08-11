@@ -15,12 +15,15 @@ let methods = [
 ]
 
 methods.forEach(method => {
-    arrayMethod[method] = function(...args) {
+    // 给arrayMethod这个Object添加七个方法
+    arrayMethod[method] = function (...args) {
         console.log('数组方法被调用了')
-            // this就是调用数组方法的data
+        // 调用原生的数组方法 this就是调用数组方法的data
         const result = oldArrayProtoMethod[method].apply(this, args);
-        let inserted
-        let ob = this.__ob__
+        let inserted;
+        // ob是Observe实例
+        let ob = this.__ob__;
+        // 处理可能插入的新项
         switch (method) {
             case 'push':
             case 'unshift': // 这两个方法都是追加，追加的类型可能是对象类型，应该在此进行劫持

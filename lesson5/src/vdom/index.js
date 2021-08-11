@@ -20,21 +20,33 @@ export function renderMixin(Vue) {
     }
 }
 
+/**
+ * 
+ * @param {*} tag 标签名 
+ * @param {*} data 元素的属性
+ * @param  {...any} children 子元素
+ * @returns 
+ */
 function createElement(tag, data = {}, ...children) {
     return vnode(tag, data, data.key, children);
 }
 
+/**
+ * 
+ * @param {*} text 文本 
+ * @returns 
+ */
 function createTextVnode(text) {
    return vnode(undefined, undefined, undefined, undefined, text);
 }
 
 /**
  * 用来产生虚拟DOM
- * @param {*} tag 
- * @param {*} data 
- * @param {*} key 
- * @param {*} children 
- * @param {*} text 
+ * @param {*} tag 标签名
+ * @param {*} data 标签属性
+ * @param {*} key 标签的key属性
+ * @param {*} children 子元素
+ * @param {*} text 文本元素传入的值
  * @returns 
  */
 function vnode(tag, data, key, children, text) {

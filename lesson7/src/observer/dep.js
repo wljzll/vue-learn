@@ -3,6 +3,7 @@ class Dep {
     constructor() {
         this.subs = [];
     }
+    // 将当前的watcher实例保存到当前dep实例的subs[]属性内
     depend() {
         this.subs.push(Dep.target);
     }

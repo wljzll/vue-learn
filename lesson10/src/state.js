@@ -40,13 +40,16 @@ function initData(vm) {
 
 function initComputed() { }
 
+
+// 处理 watch
 function initWatch(vm) {
   let watch = vm.$options.watch || {};
   for (let key in watch) {
-    const handler = watch[key]; // 每个watch watch可能是函数/数组/对象/字符串
-    if (Array.isArray(handler)) {
+    const handler = watch[key]; // watch可能是函数/数组/对象/字符串
+    if (Array.isArray(handler)) { // watch的handle是个数组
+      // 遍历监听函数数组
       handler.forEach(handle => createWatcher(vm, key, handle))
-    } else {
+    } else { // 函数/对象/字符串
       createWatcher(vm, key, handler)
     }
   }
@@ -54,15 +57,15 @@ function initWatch(vm) {
 
 /**
  * 
- * @param {*} vm 
- * @param {*} exprOrFn 
- * @param {*} handler 
+ * @param {*} vm Vue实例
+ * @param {*} exprOrFn watch的键
+ * @param {*} handler  watch的值
  * @param {*} options 用来标识是用户的watcher
  */
 function createWatcher(vm, exprOrFn, handler, options) {
-  if (typeof handler === 'object') {
-    options = handler;
-    handler = handler.handler;
+  if (typeof handler === 'object') { // watch的处理函数是Object形式
+    options = handler; // 只有这种形式下才有参数
+    handler = handler.handler; // 取它的值
   }
 
   if (typeof handler === 'string') {
@@ -70,10 +73,13 @@ function createWatcher(vm, exprOrFn, handler, options) {
   }
   return vm.$watch(exprOrFn, handler, options);
 }
+
+
 export function stateMixin(Vue) {
   Vue.prototype.$nextTick = function (cb) {
     nextTick(cb);
   }
+
   Vue.prototype.$watch = function (exprOrFn, cb, options) {
     // 数据应该依赖这个watcher，数据变化立刻执行这个watcher
     let watcher = new Watcher(this, exprOrFn, cb, {...options, user: true});

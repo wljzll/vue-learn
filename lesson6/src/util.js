@@ -55,6 +55,12 @@ LIFECYCLE_HOOKS.forEach(hook => {
 })
 
 // 这个版本只考虑生命周期函数的合并
+/**
+ * 
+ * @param {*} parent Vue.options
+ * @param {*} child  mixin(options)
+ * @returns 
+ */
 export function mergeOptions(parent, child) {
   // 遍历父亲，可能父亲有此属性 但儿子没有
   const options = {};

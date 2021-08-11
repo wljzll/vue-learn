@@ -10,7 +10,8 @@ export function initMixin(Vue) {
 
         // 初始化状态
         initState(vm);
-
+        
+        // 如果el存在调用Vue原型上的$mount()方法
         if (vm.$options.el) {
             vm.$mount(vm.$options.el);
         }

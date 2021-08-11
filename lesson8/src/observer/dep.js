@@ -7,8 +7,10 @@ class Dep {
     depend() {
         // 实现dep和watcher的双向记忆
         // this.subs.push(Dep.target);
+        // 调用watcher实例的addDep()方法
         Dep.target.addDep(this);
     }
+    // 将当前watcher实例添加到档期dep实例的subs属性中 这个方法是在watcher的addDep方法中调用的
     addSub(watcher) {
         this.subs.push(watcher);
     }

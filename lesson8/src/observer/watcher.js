@@ -23,10 +23,10 @@ class Watcher {
     }
     addDep(dep) {
         let id = dep.id;
-        if (!this.depsId.has(id)) {
+        if (!this.depsId.has(id)) { // 当前watcher未收集的dep才去收集
             // watcher记住dep
-            this.deps.push(dep);
-            this.depsId.add(id);
+            this.deps.push(dep); // 将dep实例添加到watcher的deps属性数组中
+            this.depsId.add(id); // 将dep实例的唯一id添加到watcher实例的depsId中
             // dep记住watcher
             dep.addSub(this);
         }

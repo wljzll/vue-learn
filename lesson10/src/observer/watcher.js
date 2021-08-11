@@ -5,8 +5,8 @@ class Watcher {
     /**
      * 
      * @param {*} vm vue实例
-     * @param {*} exprOrFn vm._update(vm._render()); 更新渲染真实节点
-     * @param {*} cb 
+     * @param {*} exprOrFn 1) 渲染watcher是：vm._update(vm._render()); 更新渲染真实节点；2) 用户watcher是watch的键，是个字符串
+     * @param {*} cb 1) 渲染watcher是hooks; 2) 用户watcher是watch对应的处理函数;
      * @param {*} options 
      */
     constructor(vm, exprOrFn, cb, options) {
@@ -19,17 +19,19 @@ class Watcher {
         this.id = id++; // watcher的唯一标识
         this.deps = []; // watcher记录有多少dep依赖它
         this.depsId = new Set();
-        if (typeof exprOrFn === 'function') {
-            this.getter = exprOrFn
-        } else {
+
+
+        if (typeof exprOrFn === 'function') { // 渲染watcher
+            this.getter = exprOrFn; // 数据更新时执行的函数
+        } else { // 用户watcher
             this.getter = function () { // 可能传递过来的是一个字符串
                 // 只有去当前实例上取值时 才会触发依赖收集
                 let path = exprOrFn.split('.'); // ['a', 'a', 'a']
                 let obj = vm;
                 for (let i = 0; i < path.length; i++) {
-                    obj = obj[path[i]]; // vm.a.a.a
+                    obj = obj[path[i]]; // vm.a.a.a 将值赋给obj
                 }
-                return obj;
+                return obj; // 返回的是当前新值
 
             }
         }
@@ -47,18 +49,19 @@ class Watcher {
         }
     }
     run() {
-        let newValue = this.get();
-        let oldValue = this.value; 
-        if(this.user) {
+        let newValue = this.get(); // 渲染watcher无返回值 用户watcher返回的是最新的数据
+        let oldValue = this.value; // 老值 
+        if(this.user) { // 用户watcher执行cb
             this.cb.call(this.vm, newValue, oldValue);
         }
     }
     get() {
-        pushTarget(this); // 添加这个watcher实例
-        let result = this.getter();
-        popTarget();
+        pushTarget(this); // 将当前watcher赋值给Dep.target这个静态属性
+        let result = this.getter(); // 1) 渲染watcher：渲染函数; 2) 用户watcher：对watch的键进行取值操作，触发依赖收集; 无论哪一个都会取值，触发dep收集watcher
+        popTarget(); // 收集完成后 弹出当前watcher
         return result;
     }
+    // 数据变化 执行watcher的update方法 更新
     update() {
         queueWatcher(this);
         // this.get();
@@ -70,8 +73,8 @@ let pending = false;
 
 function flushSchedulerQueue() {
     queue.forEach(watcher => { 
-        watcher.run(); 
-        if(watcher.isWatcher) {
+        watcher.run(); // 
+        if(watcher.isWatcher) { // 渲染watcher 用户watcher就不会再执行 cb 导致执行run方法时重复执行
             watcher.cb(); 
         }
        
