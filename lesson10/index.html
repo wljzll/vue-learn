@@ -8,7 +8,7 @@
 
   <body>
     <div id="app" style="color: red" class="test">
-      hello {{a}} <span>world</span>
+      hello {{arr}} <span>world</span>
     </div>
     <script src="dist/umd/vue.js"></script>
     <script>
@@ -17,6 +17,7 @@
         el: "#app",
         data() {
           return {
+            arr: [],
             a: {
               a: {
                 a:1
@@ -24,21 +25,22 @@
             },
           };
         },
-        watch: {
-          'a':{
-              handler(newValue, oldValue) {
-                  console.log(newValue, oldValue, 'xxx')
-              }
-          }
-        },
+        // watch: {
+        //   'a':{
+        //       handler(newValue, oldValue) {
+        //           console.log(newValue, oldValue, 'xxx')
+        //       }
+        //   }
+        // },
       });
-
-      vm.a = 101;
-      console.log(vm.a);
-      setTimeout(() => {
-        vm.a = 2000;
-      }, 2000);
-      console.log(vm);
+      vm.arr.push(1)
+      vm.arr = [];
+      // vm.a = 101;
+      // console.log(vm.a);
+      // setTimeout(() => {
+      //   vm.a = 2000;
+      // }, 2000);
+      // console.log(vm);
     </script>
   </body>
 </html>

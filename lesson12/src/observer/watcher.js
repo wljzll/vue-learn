@@ -5,9 +5,9 @@ class Watcher {
   /**
    *
    * @param {*} vm vue实例
-   * @param {*} exprOrFn vm._update(vm._render()); 更新渲染真实节点
-   * @param {*} cb
-   * @param {*} options
+   * @param {*} exprOrFn 1) 渲染watcher是：vm._update(vm._render()); 更新渲染真实节点；2) 用户watcher是watch的键，是个字符串
+   * @param {*} cb 1) 渲染watcher是hooks; 2) 用户watcher是watch对应的处理函数; 3)computed就是个空函数
+   * @param {*} options 1) 渲染watcher时一个布尔值; 2) 用户watcher主要是{user:true}; 3) computed的watcher是{lazy: true}
    */
   constructor(vm, exprOrFn, cb, options) {
     this.vm = vm;
@@ -38,7 +38,11 @@ class Watcher {
         return obj;
       };
     }
-    // 获取的是老值 当是计算属性的watcher时，默认不执行，当是用户的$watch或渲染watcher时，默认执行
+    
+    /**
+     * 1) 渲染watcher和用户watcher会立即执行触发对应的数据收集这两个watcher
+     * 2) computed的watcher不会立即执行，会在使用到时进行一次求值
+     */
     this.value = this.lazy ? void 0 : this.get(); // 默认调用getter方法，也就是exprOrFn
   }
   addDep(dep) {
@@ -59,15 +63,23 @@ class Watcher {
     }
   }
   get() {
-    pushTarget(this); // 添加这个watcher实例
-    let result = this.getter.call(this.vm);
+    pushTarget(this); // 将当前的watcher实例赋值给 Dep.target
+    // getter有三种：
+    // 1、渲染watcher: 执行渲染方法的函数；
+    // 2、watch：对watch的键进行取值操作，触发响应式的get()收集当前的watcher；
+    // 3、computed:computed对应的函数：会触发取值，从而触发响应式中的get()收集当前的watcher,所以computed依赖的属性都会收集computed new的这个watcher实例，当computed依赖的属性发生变化时，
+    // 会执行这个watcher，执行getter()方法，getter方法就是computed的键对应的函数值，从而对computed重新求值
+    // computed的watcher会被依赖的数据收集，从而在依赖的数据发生变化的时候触发重新求值
+    let result = this.getter.call(this.vm); 
     popTarget();
+    
     return result;
   }
   update() {
+    // 如果是computed的watcher只是将dirty置为true
     if (this.lazy) {
       this.dirty = true;
-    } else {
+    } else { // 渲染watcher和用户watcher执行对应的get方法
       queueWatcher(this);
     }
 
@@ -80,8 +92,10 @@ class Watcher {
   }
   // computed的watcher调用，用来收集渲染watcher
   depend() {
+    // 获取当前computed的watcher记忆的dep
     let i = this.deps.length;
     while (i--) {
+      // 调用dep的depend()方法，
       this.deps[i].depend(); // 让dep去储存渲染watcher
     }
   }
@@ -127,3 +141,16 @@ function queueWatcher(watcher) {
  * 4. 等会属性更新了 就重新调用渲染逻辑 通知自己储存的watcher来更新
  */
 export default Watcher;
+
+
+/**
+ * 1) 初始化computed,创建watcher - 这个watcher会执行computed对应的函数，会对data数据进行取值计算,这时对应的data就会收集computed这个watcher,
+ *    当对应的data变化时就会触发这个computed的watcher,从而对这个computed重新求值。
+ * 
+ * 2) 当渲染页面时, 会先 new Watcher() - 渲染watcher，立即执行渲染watcher的get()方法，将当前watcher添加到stack栈中，
+ * 在调用render()方法渲染页面时：
+ * 使用到了computed => 触发computed的getter => getter中调用当前computed的watcher的evaluate()方法 => 调用watcher的get()方法 => 将当前watcher加入stack中(pushTarget)
+ * => get()方法中对依赖的数据进行取值 => 触发对应数据的getter => 对应数据的dep先收集当前的computed的watcher => 执行完毕，从stack中弹出computed的watcher 
+ * => 发现Dep.target上还有渲染watcher => 调用computed的watcher的depend方法，让这个watcher收集到的dep实例(收集了computed依赖的数据的dep)去收集这个渲染watcher，
+ * 至此，computed依赖的数据把computed和渲染watcher都收集了，完成了整个computed的功能
+ */

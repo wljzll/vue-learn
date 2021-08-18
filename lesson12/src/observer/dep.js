@@ -23,8 +23,8 @@ export function pushTarget(watcher) {
     stack.push(watcher); // 收集watcher
 }
 export function popTarget() {
-    stack.pop();
-    Dep.target = stack[stack.length - 1]; // 将变量删除
+    stack.pop(); // // 弹出最后一个watcher
+    Dep.target = stack[stack.length - 1]; // Dep.target赋值上一个watcher
 }
 
 export default Dep;

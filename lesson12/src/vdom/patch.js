@@ -1,7 +1,7 @@
 /**
  *
  * @param {*} oldVnode html模板中的真实HTML
- * @param {*} vnode
+ * @param {*} vnode 虚拟DOM
  */
 export function patch(oldVnode, vnode) {
   if (!oldVnode) { // 说明是组件

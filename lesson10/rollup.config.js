@@ -15,7 +15,7 @@ export default {
         }),
         serve({
             open: true,
-            port: 3000,
+            port: 5000,
             contentBase: '', // 根路径 ''表示项目根目录
             openPage: '/index.html', // 默认打开页面
         })

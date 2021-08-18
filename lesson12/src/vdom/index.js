@@ -22,10 +22,18 @@ export function renderMixin(Vue) {
     }
 }
 
+/**
+ * 
+ * @param {*} tag 标签名 
+ * @param {*} data 元素的属性
+ * @param  {...any} children 子元素
+ * @returns 
+ */
 function createElement(vm, tag, data = {}, ...children) {
     if (isReservedTag(tag)) { // 是原生标签，不是组件，走之前逻辑
         return vnode(tag, data, data.key, children);
     } else { // 是组件
+        // 获取这个组件的构造函数
         let Ctor = vm.$options.components[tag];
         // 创建组件的虚拟节点
         return createComponent(vm, tag, data, data.key, children, Ctor);
@@ -33,15 +41,32 @@ function createElement(vm, tag, data = {}, ...children) {
 
 }
 
+
+/**
+ * @description 创建组件的虚拟节点
+ * @param {*} vm 
+ * @param {*} tag 组件名
+ * @param {*} data 组件属性
+ * @param {*} key 组件的key
+ * @param {*} children 组件的子元素
+ * @param {*} Ctor 组件这个类
+ * @returns 
+ */
 function createComponent(vm, tag, data, key, children, Ctor) {
+    // baseCtor就是Vue类
     const baseCtor = vm.$options._base;
+    // 如果之前没有注册过 就调用extend()方法生成构造函数
     if (typeof Ctor == 'object') {
         Ctor = baseCtor.extend(Ctor);
     }
+    // 在组件的属性上添加一个hook属性,这个属性中有一个init()方法,在创建真实DOM时,会调用init()方法
     data.hook = {
+        // vnode:虚拟DOM
         init(vnode) {
+            // 创建组件实例
             let child = vnode.componentInstance = new Ctor({});
-            child.$mount(); // 挂载逻辑 组件的$mount方法中是不传递参数的
+            // 挂载逻辑 组件的$mount方法中是不传递参数的
+            child.$mount(); 
         }
     }
 
@@ -57,11 +82,12 @@ function createTextVnode(text) {
 
 /**
  * 用来产生虚拟DOM
- * @param {*} tag 
- * @param {*} data 
- * @param {*} key 
- * @param {*} children 
- * @param {*} text 
+ * @param {*} tag 标签名
+ * @param {*} data 标签属性
+ * @param {*} key 标签的key属性
+ * @param {*} children 子元素
+ * @param {*} text 文本元素传入的值
+ * @param {*} componentOptions 组件的选项
  * @returns 
  */
 function vnode(tag, data, key, children, text, componentOptions) {

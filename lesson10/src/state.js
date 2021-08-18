@@ -36,6 +36,7 @@ function initData(vm) {
     proxy(vm, "_data", key);
   }
   observe(data);
+  console.log(data, '====================');
 }
 
 function initComputed() { }

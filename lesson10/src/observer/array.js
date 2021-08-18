@@ -38,3 +38,20 @@ methods.forEach(method => {
         return result
     }
 })
+
+// let data = {
+//     arr : []
+// }
+// Object.defineProperty(data, 'arr', {
+//     get() {
+//         console.log('对data上的arr取值了');
+//         return JSON.parse(JSON.stringify(data.arr))
+//     },
+//     set(newvalue) {
+//         console.log('对data上的arr赋值了');
+//     }
+// })
+
+// let arr = data.arr;
+// arr.push(1);
+// console.log(arr);

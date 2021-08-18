@@ -1,5 +1,10 @@
-import { nextTick } from "../util";
-import { popTarget, pushTarget } from "./dep";
+import {
+    nextTick
+} from "../util";
+import {
+    popTarget,
+    pushTarget
+} from "./dep";
 let id = 0;
 class Watcher {
     /**
@@ -24,6 +29,7 @@ class Watcher {
         if (typeof exprOrFn === 'function') { // 渲染watcher
             this.getter = exprOrFn; // 数据更新时执行的函数
         } else { // 用户watcher
+            // getter被包装成对watch的键进行取值的函数 从而触发依赖的收集
             this.getter = function () { // 可能传递过来的是一个字符串
                 // 只有去当前实例上取值时 才会触发依赖收集
                 let path = exprOrFn.split('.'); // ['a', 'a', 'a']
@@ -38,6 +44,7 @@ class Watcher {
         // 获取的是老值
         this.value = this.get(); // 默认调用getter方法，也就是exprOrFn
     }
+    // 收集dep dep实例的depend方法调用
     addDep(dep) {
         let id = dep.id;
         if (!this.depsId.has(id)) {
@@ -51,7 +58,7 @@ class Watcher {
     run() {
         let newValue = this.get(); // 渲染watcher无返回值 用户watcher返回的是最新的数据
         let oldValue = this.value; // 老值 
-        if(this.user) { // 用户watcher执行cb
+        if (this.user) { // 用户watcher执行cb
             this.cb.call(this.vm, newValue, oldValue);
         }
     }
@@ -72,17 +79,18 @@ let has = {};
 let pending = false;
 
 function flushSchedulerQueue() {
-    queue.forEach(watcher => { 
+    queue.forEach(watcher => {
         watcher.run(); // 
-        if(watcher.isWatcher) { // 渲染watcher 用户watcher就不会再执行 cb 导致执行run方法时重复执行
-            watcher.cb(); 
+        if (watcher.isWatcher) { // 渲染watcher 用户watcher就不会再执行 cb 导致执行run方法时重复执行
+            watcher.cb();
         }
-       
+
     });
     queue = [];
     has = {};
     pending = false;
 }
+
 function queueWatcher(watcher) {
     const id = watcher.id;
     if (has.id == null) {
@@ -109,3 +117,30 @@ function queueWatcher(watcher) {
  * 4. 等会属性更新了 就重新调用渲染逻辑 通知自己储存的watcher来更新
  */
 export default Watcher
+
+/**
+ * Dep和watcher的工作流程：
+ * 
+ * 渲染watcher：
+ *   1. 当渲染页面时, 先new Watcher()实例, new Watcher()时的核心：
+ *     1.1) 调用自己的get()方法，get()方法做了三件事：
+ *        1.1.1) pushTarget(this) - 将当前这个渲染watcher保存到Dep.target这个静态属性上;
+ *        1.1.2) let result = this.getter() - 执行传入的渲染函数，渲染页面时会取值，触发响应式数据的getter()方法，去收集这个渲染watcher;
+ *        1.1.3) popTarget() - 将当前渲染watcher从Dep.target上删除  
+ * 
+ * 
+ *   2. observe数据的时候，每个值都会对应一个Dep实例，并且在这个data的get和set函数中做对应的处理
+ *    1.1) get()方法执行时, 会调用对应的Dep实例的depend()方法 - depend()方法，会获取到Dep.target上当前的watcher实例,让watcher实例调用自己的addDep()方法
+ *         addDep方法: 将当前dep实例添加到自己的deps属性中，并且调用dep的addSub方法，
+ *         addSub方法: 将当前watcher添加到自己的subs属性中
+ *         从而实现了dep和watcher的双向记忆
+ *    1.2) set()方法执行时，会调用对应的dep的notify()方法;
+ *         notify方法: 将这个dep实例subs属性中的watcher拿出来，依次调用它的update方法;
+ *         update方法: 收集一段时间内要执行的watcher, 批量执行这些watcher;
+ * 
+ * 用户watcher：
+ *    1. 初始化用户的watch - new Watcher()
+ *    2. new Watcher时,将用户watcher传入的watch的键包装成getter函数 - getter函数是对watch的键进行取值，
+ *       从而触发对应的get()收集这个用户watcher
+ *    3. 后面就是依赖的收集，和数据变化时的notify()通知
+ */
