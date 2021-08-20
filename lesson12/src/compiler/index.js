@@ -10,7 +10,8 @@ export function compileToFunctions(template) {
      * 1、将html代码转化成AST抽象语法树 可以用AST抽象语法树来描述语言本身
      * 2、通过这棵树 重新生成代码
      */
-
+    
+    // 将template通过字符串截取等操作转换成抽象语法树
     let ast = parseHTML(template);
 
     // 2、优化静态节点

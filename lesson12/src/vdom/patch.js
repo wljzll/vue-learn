@@ -149,10 +149,20 @@ function updateChildren(oldChildren, newChildren, parent) {
   }
 }
 
+/**
+ * 去调用这个虚拟DOM的hook中的init方法,如果有就说明是组件,没有就是普通元素
+ * @param {*} vnode 虚拟DOM 
+ * @returns 
+ */
 function createComponent(vnode) {
   // 调用组件hook中的init方法
   let i = vnode.data;
   if ((i = i.hook) && (i = i.init)) { // i就是init方法
+    /**
+     * init()方法做了两件事:
+     * 1) 创建实例,调用了_init()方法
+     * 2) 手动调用$mount方法,将组件编译成了虚拟DOM
+     */
     i(vnode);
   }
   if (vnode.componentInstance) {
@@ -161,10 +171,12 @@ function createComponent(vnode) {
 }
 
 export function createElm(vnode) {
+  // 结构出对应的字段
   let { tag, children, key, data, text } = vnode;
+  // 是元素节点或者组件
   if (typeof tag === "string") {
     if (createComponent(vnode)) { // 是组件
-      console.log(vnode.componentInstance);
+      console.log(vnode.componentInstance, '**************');
       return vnode.componentInstance.$el;
     }
     // 如果是一个标签
@@ -174,7 +186,7 @@ export function createElm(vnode) {
     children.forEach((child) => {
       vnode.el.appendChild(createElm(child));
     });
-  } else {
+  } else { // 文本节点
     vnode.el = document.createTextNode(text);
   }
   return vnode.el;
@@ -213,3 +225,14 @@ function updateProperties(vnode, oldProps = {}) {
     }
   }
 }
+
+/**
+ * <div id="app" style="color: red;font-size: 12px;">
+ *       <my-button></my-button>
+ * </div>
+ * 渲染时创建子组件的流程:
+ * 1) 当从根模板开始渲染时,先渲染div,通过createElm()方法开始渲染,先创建div标签,然后遍历div的子元素,遍历到了my-button组件
+ * 2) 调用createElm()方法渲染my-button组件
+ *    new Ctor()组件实例 => 组件实例调用$mount()方法 => 在解析这个组件的template过程中,从头开始走了根模板渲染的流程 => 然后会将组件中的生成的DOM元素挂载到vnode的componentInstance上
+ *    => 最后是将组件中生成的真实DOM作为子元素添加到了div根元素里
+ */

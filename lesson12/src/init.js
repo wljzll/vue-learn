@@ -14,6 +14,7 @@ export function initMixin(Vue) {
         // 初始化状态
         initState(vm);
         callHook(vm, 'created');
+        // 只有传入了el属性才会取调用$mount()方法
         if (vm.$options.el) {
             vm.$mount(vm.$options.el);
         }

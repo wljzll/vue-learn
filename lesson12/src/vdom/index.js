@@ -1,5 +1,6 @@
 import { isReservedTag } from "../util";
 
+//  _c('div', {id: 'app', style: {color: 'red'}}, _v('hello' + _s(name)), _c('span', null, _v('hello')))
 export function renderMixin(Vue) {
 
     Vue.prototype._c = function() { // 创建虚拟元素
@@ -67,6 +68,7 @@ function createComponent(vm, tag, data, key, children, Ctor) {
             let child = vnode.componentInstance = new Ctor({});
             // 挂载逻辑 组件的$mount方法中是不传递参数的
             child.$mount(); 
+            console.log(child, 'childchild');
         }
     }
 
