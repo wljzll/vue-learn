@@ -170,19 +170,23 @@ function createComponent(vnode) {
   }
 }
 
+/**
+ * 
+ * @param {Object} vnode 虚拟DOM 
+ * @returns 
+ */
 export function createElm(vnode) {
-  // 结构出对应的字段
+  // 解构出对应的字段
   let { tag, children, key, data, text } = vnode;
-  // 是元素节点或者组件
-  if (typeof tag === "string") {
-    if (createComponent(vnode)) { // 是组件
-      console.log(vnode.componentInstance, '**************');
-      return vnode.componentInstance.$el;
+  if (typeof tag === "string") { // 元素或组件
+    if (createComponent(vnode)) { // 组件 调用createCompoent(vnode) 生成真实DOM
+      return vnode.componentInstance.$el; // 经过createComponent(vnode)处理 vnode.componentInstance.$el上就是组件真实的DOM
     }
-    // 如果是一个标签
+    // 创建HTML标签
     vnode.el = document.createElement(tag);
     // 处理元素属性
     updateProperties(vnode);
+    // 递归子元素
     children.forEach((child) => {
       vnode.el.appendChild(createElm(child));
     });

@@ -4,14 +4,15 @@ class Dep {
         this.subs = [];
         this.id = id++;
     }
+    // 调用watcher的addDep()方法 让对应的watcher实例记录dep实例
     depend() {
-        // 实现dep和watcher的双向记忆
-        // this.subs.push(Dep.target);
         Dep.target.addDep(this);
     }
+    // watcher实例中调用 将watcher保存到当前dep实例上
     addSub(watcher) {
         this.subs.push(watcher);
     }
+    // 遍历当前dep实例记录的所有watcher 调用watcher实例的update()方法
     notify() {
         this.subs.forEach(watcher => watcher.update());
     }

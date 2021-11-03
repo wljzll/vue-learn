@@ -5,8 +5,8 @@ class Watcher {
   /**
    *
    * @param {*} vm vue实例
-   * @param {*} exprOrFn 1) 渲染watcher是：vm._update(vm._render()); 更新渲染真实节点；2) 用户watcher是watch的键，是个字符串
-   * @param {*} cb 1) 渲染watcher是hooks; 2) 用户watcher是watch对应的处理函数; 3)computed就是个空函数
+   * @param {*} exprOrFn 1) 渲染watcher是：vm._update(vm._render()),更新渲染真实节点; 2) 用户watcher是watch的键，是个字符串; 3) computed就是computed对应的取值函数
+   * @param {*} cb 1) 渲染watcher是hooks; 2) 用户watcher是watch对应的处理函数; 3) computed就是个空函数
    * @param {*} options 1) 渲染watcher时一个布尔值; 2) 用户watcher主要是{user:true}; 3) computed的watcher是{lazy: true}
    */
   constructor(vm, exprOrFn, cb, options) {
@@ -26,14 +26,14 @@ class Watcher {
     this.depsId = new Set();
     if (typeof exprOrFn === "function") {
       this.getter = exprOrFn;
-    } else {
+    } else { // 用户的watch选项
       this.getter = function () {
         // 可能传递过来的是一个字符串
         // 只有去当前实例上取值时 才会触发依赖收集
         let path = exprOrFn.split("."); // ['a', 'a', 'a']
         let obj = vm;
         for (let i = 0; i < path.length; i++) {
-          obj = obj[path[i]]; // vm.a.a.a
+          obj = obj[path[i]]; // vm.a.a.a // 用户watcher取值 触发get dep收集当前watcher
         }
         return obj;
       };
@@ -58,7 +58,8 @@ class Watcher {
   run() {
     let newValue = this.get();
     let oldValue = this.value;
-    if (this.user) {
+    if (this.user) { // 用户watcher
+      // 用户watcher触发watcher对应函数的执行
       this.cb.call(this.vm, newValue, oldValue);
     }
   }
@@ -85,12 +86,12 @@ class Watcher {
 
     // this.get();
   }
-  // 计算属性求值
+  // computed使用：计算属性求值 
   evaluate() {
     this.value = this.get();
     this.dirty = false; // 取过一次值后，就标识成已经取过值了
   }
-  // computed的watcher调用，用来收集渲染watcher
+  // computed使用：computed的watcher调用, 让computed依赖的数据去收集当前的渲染watcher, 实现一种特殊情况下的页面更新
   depend() {
     // 获取当前computed的watcher记忆的dep
     let i = this.deps.length;
@@ -100,39 +101,38 @@ class Watcher {
     }
   }
 }
+
+// --------------------------------- queueWatcher ---------------------------------------
 let queue = []; // 将需要批量更新的watcher存到一个队列中 稍后执行
 let has = {};
 let pending = false;
-
+// 遍历收集的watcher 执行watcher的run()方法
 function flushSchedulerQueue() {
   queue.forEach((watcher) => {
     watcher.run();
-    if (watcher.isWatcher) {
+    if (watcher.isWatcher) { // 渲染watcher会有更新
       watcher.cb();
     }
   });
+  // 还原状态
   queue = [];
   has = {};
   pending = false;
 }
 
+// 短时间内可能多次调用queueWatcher
 function queueWatcher(watcher) {
   const id = watcher.id;
-  if (has.id == null) {
-    queue.push(watcher);
-    has.id = true;
+  if (has.id == null) { // 如果此前未收集过此watcher
+    queue.push(watcher); // 添加到队列中
+    has.id = true; // 标识已收集id对应的watcher
   }
   if (!pending) {
-    // setTimeout(() => {
-    //     queue.forEach(watcher => watcher.run());
-    //     queue = [];
-    //     has = {};
-    //     pending = false;
-    // }, 0);
-    nextTick(flushSchedulerQueue);
+    nextTick(flushSchedulerQueue); // 在微任务里执行收集的watcher队列
     pending = true;
   }
 }
+// --------------------------------- queueWatcher ---------------------------------------
 /**
  * 在数据劫持的时候 定义 defineProperty的时候，已经给每个属性都添加了dep
  * 1. 是想把这个渲染watcher 放到dep.target属性上
@@ -154,3 +154,9 @@ export default Watcher;
  * => 发现Dep.target上还有渲染watcher => 调用computed的watcher的depend方法，让这个watcher收集到的dep实例(收集了computed依赖的数据的dep)去收集这个渲染watcher，
  * 至此，computed依赖的数据把computed和渲染watcher都收集了，完成了整个computed的功能
  */
+
+// 渲染watcher和用户watcher执行流程
+// watcher.update() => queueWatcher() => flushSchedulerQueue() => run() => get()
+
+// computed对应watcher的执行流程
+// watcher.evaluate()

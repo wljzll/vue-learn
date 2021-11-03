@@ -18,7 +18,7 @@ function Vue(options) {
 }
 
 // 原型方法初始化
-// 初始化
+// 初始化 在Vue原型上添加 _init() 和 $mount()方法
 initMixin(Vue);
 
 // 在Vue原型上添加_update()方法

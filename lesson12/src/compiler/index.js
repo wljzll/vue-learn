@@ -17,7 +17,7 @@ export function compileToFunctions(template) {
     // 2、优化静态节点
 
 
-    // 3、通过这棵树，重新生成代码
+    // 3、通过这棵树，重新生成代码 生成AST抽象语法树
     let code = generate(ast);
 
     // console.log(typeof ast.attrs[1].value, 'AST');

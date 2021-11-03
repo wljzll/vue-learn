@@ -17,6 +17,8 @@ export function defineProperty(target, key, value) {
   });
 }
 
+
+// ----------------------------------------- mergeHook -----------------------------------------------------
 export const LIFECYCLE_HOOKS = [
   "beforeCreate",
   "created",
@@ -59,6 +61,7 @@ function mergeHook(parentVal, childVal) {
     return parentVal; // 不合并了 直接采用父亲的
   }
 }
+
 LIFECYCLE_HOOKS.forEach((hook) => {
   strats[hook] = mergeHook;
 });
@@ -96,16 +99,19 @@ export function mergeOptions(parent, child) {
 
   return options;
 }
+// ----------------------------------------- mergeHook -----------------------------------------------------
 
-let callbacks = [];
-let pending = false;
+// ----------------------------------------- nextTick ------------------------------------------------------
+
+let callbacks = []; // 存放nextTick传入的cb
+let pending = false; // 开关
 
 function flushCallbacks() {
-  while (callbacks.length) {
+  while (callbacks.length) { // 一次执行callbacks
     let cb = callbacks.pop();
     cb();
   }
-  pending = false;
+  pending = false; // 执行完成 打开开关
 }
 
 let timerFunc;
@@ -131,12 +137,14 @@ if (Promise) {
 }
 
 export function nextTick(cb) {
-  callbacks.push(cb);
-  if (!pending) {
+  callbacks.push(cb); // 收集nextTick函数参数
+  if (!pending) { // 在timerFunc执行完成前不再重新执行
     timerFunc();
     pending = true;
   }
 }
+// ---------------------------------------------  nextTick ----------------------------------------------
+
 
 function makeMap(str) {
   const mapping = {};

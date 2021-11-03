@@ -23,7 +23,7 @@ export function initGlobalApi(Vue) {
         // new definition().$mount();
         definition = this.options._base.extend(definition);
 
-        // Vue.component 注册组件就相当于 Vue.options.components[id] = definition;
+        // 将生成的组件的类保存到Vue类的optios属性上
         Vue.options.components[id] = definition;
     }
 }

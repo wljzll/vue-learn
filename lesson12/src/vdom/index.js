@@ -56,7 +56,7 @@ function createElement(vm, tag, data = {}, ...children) {
 function createComponent(vm, tag, data, key, children, Ctor) {
     // baseCtor就是Vue类
     const baseCtor = vm.$options._base;
-    // 如果之前没有注册过 就调用extend()方法生成构造函数
+    // 如果之前没有注册过 就调用extend()方法生成构造函数 比如在new Vue({component: {a:{template: '<div></div>'}}})
     if (typeof Ctor == 'object') {
         Ctor = baseCtor.extend(Ctor);
     }
@@ -68,7 +68,6 @@ function createComponent(vm, tag, data, key, children, Ctor) {
             let child = vnode.componentInstance = new Ctor({});
             // 挂载逻辑 组件的$mount方法中是不传递参数的
             child.$mount(); 
-            console.log(child, 'childchild');
         }
     }
 
