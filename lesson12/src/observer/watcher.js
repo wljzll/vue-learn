@@ -45,6 +45,7 @@ class Watcher {
      */
     this.value = this.lazy ? void 0 : this.get(); // 默认调用getter方法，也就是exprOrFn
   }
+  // 遍历watcher的deps 让dep存储当前watcher
   addDep(dep) {
     let id = dep.id;
     if (!this.depsId.has(id)) {
@@ -63,6 +64,7 @@ class Watcher {
       this.cb.call(this.vm, newValue, oldValue);
     }
   }
+  // 1. 全局挂载watcher; 2. 执行getter()方法; 3. 弹出watcher
   get() {
     pushTarget(this); // 将当前的watcher实例赋值给 Dep.target
     // getter有三种：
