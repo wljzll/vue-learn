@@ -1,14 +1,14 @@
 import { nextTick } from "../util";
 import { popTarget, pushTarget } from "./dep";
 let id = 0;
+ /**
+ *
+ * @param {*} vm        vue实例
+ * @param {*} exprOrFn  1) 渲染watcher是：vm._update(vm._render()),更新渲染真实节点;  2) 用户watcher是watch的键，是个字符串; 3) computed就是computed对应的取值函数
+ * @param {*} cb        1) 渲染watcher是hooks;      2) 用户watcher是watch对应的处理函数;   3) computed就是个空函数
+ * @param {*} options   1) 渲染watcher时一个布尔值;  2) 用户watcher主要是{user:true};  3) computed的watcher是{lazy: true}
+ */
 class Watcher {
-  /**
-   *
-   * @param {*} vm vue实例
-   * @param {*} exprOrFn 1) 渲染watcher是：vm._update(vm._render()),更新渲染真实节点; 2) 用户watcher是watch的键，是个字符串; 3) computed就是computed对应的取值函数
-   * @param {*} cb 1) 渲染watcher是hooks; 2) 用户watcher是watch对应的处理函数; 3) computed就是个空函数
-   * @param {*} options 1) 渲染watcher时一个布尔值; 2) 用户watcher主要是{user:true}; 3) computed的watcher是{lazy: true}
-   */
   constructor(vm, exprOrFn, cb, options) {
     this.vm = vm;
     this.exprOrFn = exprOrFn;
@@ -24,6 +24,8 @@ class Watcher {
     this.id = id++; // watcher的唯一标识
     this.deps = []; // watcher记录有多少dep依赖它
     this.depsId = new Set();
+
+    // 将exprOrFn统一处理成函数
     if (typeof exprOrFn === "function") {
       this.getter = exprOrFn;
     } else { // 用户的watch选项
@@ -112,7 +114,7 @@ let pending = false;
 function flushSchedulerQueue() {
   queue.forEach((watcher) => {
     watcher.run();
-    if (watcher.isWatcher) { // 渲染watcher会有更新
+    if (watcher.isWatcher) { // 渲染watcher执行对应的生命周期函数
       watcher.cb();
     }
   });

@@ -4,7 +4,7 @@
  * @param {*} vnode 虚拟DOM
  */
 export function patch(oldVnode, vnode) {
-  if (!oldVnode) { // 说明是组件
+  if (!oldVnode) { // 说明是组件的渲染
     return createElm(vnode);
   }
   if (oldVnode.nodeType === 1) {
@@ -57,15 +57,15 @@ function isSameVnode(oldVnode, vnode) {
 }
 
 function updateChildren(oldChildren, newChildren, parent) {
-  let oldStartIndex = 0;
-  let oldStartVnode = oldChildren[0];
-  let oldEndIndex = oldChildren.length - 1;
-  let oldEndVnode = oldChildren[oldEndIndex];
+  let oldStartIndex = 0; // 老Vnode开始索引
+  let oldStartVnode = oldChildren[0]; // 老Vnode开始元素
+  let oldEndIndex = oldChildren.length - 1; // 老Vnode结束索引
+  let oldEndVnode = oldChildren[oldEndIndex]; // 老Vnode结束元素
 
-  let newStartIndex = 0;
-  let newStartVnode = newChildren[0];
-  let newEndIndex = newChildren.length - 1;
-  let newEndVnode = newChildren[newEndIndex];
+  let newStartIndex = 0; // 新Vnode开始索引
+  let newStartVnode = newChildren[0]; // 新Vnode开始元素
+  let newEndIndex = newChildren.length - 1; // 新Vnode结束索引
+  let newEndVnode = newChildren[newEndIndex]; // 新Vnode结束元素
 
   function makeIndexByKey(children) {
     let map = {};

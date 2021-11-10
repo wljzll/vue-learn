@@ -21,6 +21,7 @@ class Observer {
         }
 
     }
+    // 循环数组每一项 observe引用类型的数组项
     observeArray(value) {
         value.forEach(item => {
             // 观测数组中的对象类型

@@ -7,7 +7,12 @@ const startTagClose = /^\s*(\/?)>/; // 匹配标签结束的 >
 
 
 export function parseHTML(html) {
-
+    /**
+     * 将解析出的对象组合成AST抽象语法树
+     * @param {string} tagName 标签名
+     * @param {Array} attrs 属性 
+     * @returns AST抽象语法树
+     */
     function createASTElement(tagName, attrs) {
         return {
             tag: tagName, // 标签名
@@ -95,7 +100,6 @@ export function parseHTML(html) {
             let end, attr;
             // 不是开始标签的闭合符 并且能匹配到属性
             while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
-                // console.log(attr, '======')
                 advance(attr[0].length); // 去掉当前属性
                 match.attrs.push({
                     name: attr[1],
