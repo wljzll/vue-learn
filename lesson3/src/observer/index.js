@@ -9,6 +9,7 @@ import {
 class Observer {
     constructor(value) {
         // 判断一个对象是否被观测过看他有没有__ob__这个属性
+
         // 给当前被观测的数据添加 __ob__属性，值是类的实例本身 
         Object.defineProperty(value, '__ob__', {
             enumerable: false,
@@ -43,8 +44,9 @@ class Observer {
 }
 
 function defineReactive(data, key, value) {
-    // 如果值是一个对象
+    // 把value再交给observe处理
     observe(value)
+    // 将key用defineProperty定义到data上
     Object.defineProperty(data, key, {
         get() {
             console.log('用户获取值了', data, key, value)
@@ -74,6 +76,6 @@ export function observe(data) {
     if (data.__ob__) {
         return data;
     }
-
+    // 创建Observe实例并将数据对象传入
     return new Observer(data)
 }

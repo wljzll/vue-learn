@@ -28,6 +28,7 @@ function initMethods() {}
 
 // 数据的初始化操作
 function initData(vm) {
+    // 从options上拿到data
     let data = vm.$options.data
     data = typeof data === 'function' ? data.call(vm) : data;
     observe(data)
