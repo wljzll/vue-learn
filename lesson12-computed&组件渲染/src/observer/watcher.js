@@ -32,7 +32,8 @@ class Watcher {
     this.isWatcher = typeof options === "boolean"; // 标识是渲染watcher
     this.id = id++; // watcher的唯一标识
     this.deps = []; // watcher记录有多少dep依赖它
-    this.depsId = new Set();
+
+    this.depsId = new Set(); // 缓存depsId 防止重复添加
 
     // 将exprOrFn统一处理成getter函数
     if (typeof exprOrFn === "function") {
@@ -51,9 +52,10 @@ class Watcher {
     }
     
     // lazy:true 是computed的watcher他自己会执行
+    // 渲染watcher和用户watcher会默认执行一次 触发依赖收集
     this.value = this.lazy ? void 0 : this.get();
   }
-  // 遍历watcher的deps 让dep存储当前watcher
+  // watcher收集dep dep收集watcher
   addDep(dep) {
     let id = dep.id;
     if (!this.depsId.has(id)) {
@@ -132,8 +134,10 @@ let pending = false;
 // 遍历收集的watcher 执行watcher的run()方法
 function flushSchedulerQueue() {
   queue.forEach((watcher) => {
+
     watcher.run();
-    if (watcher.isWatcher) { // 渲染watcher执行对应的生命周期函数
+
+    if (watcher.isWatcher) { // 渲染watcher执行updated生命周期函数
       watcher.cb();
     }
   });

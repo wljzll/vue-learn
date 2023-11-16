@@ -1,17 +1,31 @@
 import { isReservedTag } from "../util";
 
 //  _c('div', {id: 'app', style: {color: 'red'}}, _v('hello' + _s(name)), _c('span', null, _v('hello')))
+/**
+ * @description 往Vue原型链上挂载_c/_s/_v/_render方法
+ * @param {*} Vue Vue类
+ */
 export function renderMixin(Vue) {
 
     Vue.prototype._c = function() { // 创建虚拟元素
         return createElement(this, ...arguments);
     }
-
-    Vue.prototype._s = function(val) { // 解析插值表达式 stringify
+    
+    /**
+     * @description 解析插值表达式 stringify
+     * @param {*} val 插值表达式的值
+     * @returns 
+     */
+    Vue.prototype._s = function(val) {
         return val = null ? '' : (typeof val === 'object') ? JSON.stringify(val) : val;
     }
-
-    Vue.prototype._v = function(text) { // 创建虚拟文本元素
+    
+    /**
+     * @description 创建虚拟文本元素
+     * @param {*} text 
+     * @returns 
+     */
+    Vue.prototype._v = function(text) {
         return createTextVnode(text);
     }
 
@@ -44,7 +58,7 @@ function createElement(vm, tag, data = {}, ...children) {
 
 
 /**
- * @description 创建组件的虚拟节点
+ * @description 创建组件的虚拟DOM
  * @param {*} vm 
  * @param {*} tag 组件名
  * @param {*} data 组件属性
@@ -56,10 +70,13 @@ function createElement(vm, tag, data = {}, ...children) {
 function createComponent(vm, tag, data, key, children, Ctor) {
     // baseCtor就是Vue类
     const baseCtor = vm.$options._base;
+
     // 注册过的组件是个构造函数 typeof Ctor === 'function'
+    // 如果是个object说明没注册过 调用Vue类的extend属性注册组件 返回构造函数
     if (typeof Ctor == 'object') {
         Ctor = baseCtor.extend(Ctor);
     }
+
     // 在组件的属性上添加一个hook属性,这个属性中有一个init()方法,在创建真实DOM时,会调用init()方法
     data.hook = {
         // vnode:虚拟DOM
@@ -77,12 +94,17 @@ function createComponent(vm, tag, data, key, children, Ctor) {
     })
 }
 
+/**
+ * 
+ * @param {*} text 
+ * @returns 
+ */
 function createTextVnode(text) {
     return vnode(undefined, undefined, undefined, undefined, text);
 }
 
 /**
- * 用来产生虚拟DOM
+ * @description 创建虚拟DOM
  * @param {*} tag 标签名
  * @param {*} data 标签属性
  * @param {*} key 标签的key属性

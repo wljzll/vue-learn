@@ -42,18 +42,25 @@ function initData(vm) {
 
 // -------------------------------------------------------------- computed 开始 --------------------------------------------------------------------------------
 function initComputed(vm) {
+
   // 拿到组件中定义的computed对象
   let computed = vm.$options.computed;
+
   // 稍后用来存放计算属性的watcher
   const watcher = (vm._computedWatchers = {});
+
   // 遍历computed
   for (let key in computed) {
+    
     // 取出每一个computed; userDef有两种形式：1. 函数; 2.Object - {get:(), set()}
     const userDef = computed[key];
+
     // 是函数直接使用 不是函数获取Object的get函数 目的是将 getter包装成函数
     const getter = typeof userDef == "function" ? userDef : userDef.get;
+
     // 为每个computed各自创建一个watcher 默认不执行 并保存
     watcher[key] = new Watcher(vm, getter, () => {}, { lazy: true });
+
     defineComputed(vm, key, userDef);
   }
 }
@@ -114,10 +121,12 @@ function createComputedGetter(key) {
 // ------------------------------------------------------- watch 开始 ----------------------------------------------------------------------------------------
 function initWatch(vm) {
   let watch = vm.$options.watch; // 获取用户定义的watch
+  // 遍历watch
   for (let key in watch) {
-    const handler = watch[key]; // 每个watch watch可能是函数/数组/对象/字符串
+    // watch可能是函数/数组/对象/字符串
+    const handler = watch[key]; 
     if (Array.isArray(handler)) {
-      // 数组单独处理
+      // 数组单独处理 数组的每一个回调函数都会创建一个watcher
       handler.forEach((handle) => createWatcher(vm, key, handle));
     } else {
       createWatcher(vm, key, handler);
@@ -127,7 +136,7 @@ function initWatch(vm) {
 
 /**
  *
- * @param {*} vm       vue实例
+ * @param {*} vm vue实例
  * @param {*} exprOrFn watch对应的key
  * @param {*} handler  watch的值可能是函数 或者 {}
  * @param {*} options  用来标识是用户的watcher
@@ -148,7 +157,13 @@ function createWatcher(vm, exprOrFn, handler, options) {
 }
 // ------------------------------------------------------- watch 结束 ----------------------------------------------------------------------------------------
 
+
+/**
+ * @description 往Vue原型链上挂载$nextTick和$watch方法
+ * @param {*} Vue Vue类
+ */
 export function stateMixin(Vue) {
+
   Vue.prototype.$nextTick = function (cb) {
     nextTick(cb);
   };

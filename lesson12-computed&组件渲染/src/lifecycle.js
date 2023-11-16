@@ -1,11 +1,18 @@
 import Watcher from "./observer/watcher";
 import { patch } from "./vdom/patch";
 
+/**
+ * @description 在Vue原型链上挂载_update方法
+ * @param {*} Vue Vue类
+ */
 export function lifecycleMixin(Vue) {
+    
     Vue.prototype._update = function(vnode) {
         const vm = this;
+
         // 初次渲染不存在_vnode
         const prevNode = vm._vnode;
+
         if (!prevNode) { // 初次渲染 
             // vm.$el：真实DOM vnode: 虚拟DOM
             vm.$el = patch(vm.$el, vnode);
@@ -19,10 +26,15 @@ export function lifecycleMixin(Vue) {
 
 export function mountComponent(vm, el) {
     callHook(vm, "beforeMount");
+
+    // 初次渲染和更新都会调用
     let updateComponent = () => {
-        vm._update(vm._render());//vm._render()生成虚拟DOM
+        vm._update(vm._render()); // vm._render()生成虚拟DOM
     };
+
+    // 创建渲染watcher
     new Watcher(vm, updateComponent, () => { callHook(vm, "updated") }, true);
+
     callHook(vm, "mounted");
 }
 

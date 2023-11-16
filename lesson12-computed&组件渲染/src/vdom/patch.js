@@ -1,18 +1,24 @@
 /**
  *
- * @param {*} oldVnode html模板中的真实HTML
+ * @param {*} oldVnode html模板中的真实HTML 初次渲染时是#app
  * @param {*} vnode 虚拟DOM
  */
 export function patch(oldVnode, vnode) {
-  if (!oldVnode) { // 说明是组件的渲染
+
+  if (!oldVnode) { // 说明是组件的渲染 不是普通元素的渲染
     return createElm(vnode);
   }
+
   if (oldVnode.nodeType === 1) {
     // 真实DOM节点
     let el = createElm(vnode);
+
     let parentElm = oldVnode.parentNode; // 获取老的app的父亲 => body
+
     parentElm.insertBefore(el, oldVnode.nextSibling); // 当前的真实元素插入到app的前面
+
     parentElm.removeChild(oldVnode); // 删除老的节点
+
     return el;
   } else {
     // 1、比较两个标签，标签不一样直接替换
@@ -66,7 +72,8 @@ function updateChildren(oldChildren, newChildren, parent) {
   let newStartVnode = newChildren[0]; // 新Vnode开始元素
   let newEndIndex = newChildren.length - 1; // 新Vnode结束索引
   let newEndVnode = newChildren[newEndIndex]; // 新Vnode结束元素
-
+  
+  // 把老的儿子做成映射表
   function makeIndexByKey(children) {
     let map = {};
     children.forEach((item, index) => {
@@ -178,22 +185,29 @@ function createComponent(vnode) {
  * @returns 
  */
 export function createElm(vnode) {
+  
   // 解构出对应的字段
   let { tag, children, key, data, text } = vnode;
+
   if (typeof tag === "string") { // 元素或组件
+
     if (createComponent(vnode)) { // 组件 调用createCompoent(vnode) 生成真实DOM
       return vnode.componentInstance.$el; // 经过createComponent(vnode)处理 vnode.componentInstance.$el上就是组件真实的DOM
     }
-    // 创建HTML标签
+ 
+    // 创建HTML标签 将真实的DOM节点挂载到虚拟DOM的el属性上
     vnode.el = document.createElement(tag);
+
     // 处理元素属性
     updateProperties(vnode);
+
     // 递归子元素
     children.forEach((child) => {
       vnode.el.appendChild(createElm(child));
     });
+
   } else { // 文本节点
-    vnode.el = document.createTextNode(text);
+    vnode.el = document.createTextNode(text); // 将真实的DOM节点挂载到虚拟DOM的el属性上
   }
   return vnode.el;
 }
@@ -211,6 +225,7 @@ function updateProperties(vnode, oldProps = {}) {
   // 样式比对
   let newStyle = newProps.style || {};
   let oldStyle = oldProps.style || {};
+
   for (let key in oldStyle) {
     // 老的样式里有，新的样式没有，将老的删除
     if (!newStyle[key]) {
@@ -238,7 +253,18 @@ function updateProperties(vnode, oldProps = {}) {
  * </div>
  * 渲染时创建子组件的流程:
  * 1) 当从根模板开始渲染时,先渲染div,通过createElm()方法开始渲染,先创建div标签,然后遍历div的子元素,遍历到了my-button组件
- * 2) 调用createElm()方法渲染my-button组件
- *    new Ctor()组件实例 => 组件实例调用$mount()方法 => 在解析这个组件的template过程中,从头开始走了根模板渲染的流程 => 然后会将组件中的生成的DOM元素挂载到vnode的componentInstance上
- *    => 最后是将组件中生成的真实DOM作为子元素添加到了div根元素里
+ * 2) 
+ *    调用createElm()方法渲染my-button组件 =>
+ *    调用createComponent()方法 =>
+ *    调用组件实例 hook: {init: () => {}}中的init方法 =>
+ *    init方法调用原型上的$mount()方法 =>
+ *    $mount()调用mountComponent()方法 =>
+ *    mountComponent()调用updateComponent()方法 =>
+ *    调用组件的render()方法生成组件中真实DOM的虚拟DOM =>
+ *    调用patch()方法 =>
+ *    patch()方法直接调用createElm()方法 =>
+ *    createElm()返回组件的真实DOM => 
+ *    把生成的真实DOM挂载到组件实例的 vm.componentInstance.$el上
+ *    将组件的真实DOM追加到div中 =>
+ *    组件渲染完毕
  */

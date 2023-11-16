@@ -3,18 +3,25 @@ import { callHook, mountComponent } from "./lifecycle";
 import { initState } from "./state";
 import { mergeOptions } from "./util";
 
-// 在这里进行各种初始化操作
+/**
+ * @description 往Vue类的原型上挂载_init和$mount方法
+ * @param {*} Vue Vue类
+ */
 export function initMixin(Vue) {
+    
     Vue.prototype._init = function(options) {
         const vm = this;
-        // vm.$options = options;
         // 将用户new Vue时传入的options和混入的全局options做合并
         vm.$options = mergeOptions(this.constructor.options, options); 
+
         callHook(vm, 'beforeCreate');
+
         // 初始化状态
         initState(vm);
+
         callHook(vm, 'created');
-        // 只有传入了el属性才会主动调用$mount()方法
+        
+        // 只有传入了el属性才会主动调用$mount()方法 组件不会调用 根才会调用
         if (vm.$options.el) {
             vm.$mount(vm.$options.el);
         }
@@ -26,8 +33,9 @@ export function initMixin(Vue) {
         const options = vm.$options;
         el = document.querySelector(el);
         vm.$el = el;
+
+        // 没有render 对模板进行编译
         if (!options.render) {
-            // 没有render 将template转化成render方法
             let template = options.template;
             if (!template && el) {
                 template = el.outerHTML;
@@ -36,7 +44,8 @@ export function initMixin(Vue) {
             const render = compileToFunctions(template);
             options.render = render;
         }
-
+        
+        // 组件经过vue-loader处理是有render函数的
         mountComponent(vm, el);
     };
 }
